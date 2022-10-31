@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/framework/img/logo.png">
+  <img src="img/logo.png">
 </p>
 
 ## Motivation 
@@ -18,7 +18,7 @@ The number of executed C statements is obtained by profiling the benchmark funct
 
 ### Screenshots
 <p align="center">
-  <img src="/framework/img/screen2.png">
+  <img src="img/screen2.png">
 </p>
 
 ###  Installation 
@@ -27,7 +27,7 @@ The installation of the framework is accomplished through a few simple steps. Al
 The framework is implemented in Python3 and uses the csv, os, shutil, subprocess, tkinter libraries for internal operations. Thus, Python3 and the above listed libraries should be installed for the framwork to run properly. 
 
 #### Profiling
-The profiling phase requires the execution of [gcc-8](https://gcc.gnu.org/gcc-8/) and [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html).
+The profiling phase requires the execution of [gcc](https://gcc.gnu.org/gcc/) and [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html).
 
 #### Static Analysis
 This step requires the [frama-c](https://frama-c.com/) software analyzer.
@@ -36,8 +36,6 @@ This step requires the [frama-c](https://frama-c.com/) software analyzer.
 The simulation phase involves the execution of the toolchain of each processor supported by the framework. The following is a description of each supported processor and the tools needed to get the information required to calculate CC4CS:
 
 - Atmega328p: 
-	- sed: it is needed to convert the instruction set simulator output  to a format readable by the framework parser;
-	- **[perf stat](https://man7.org/linux/man-pages/man1/perf-stat.1.html)** : needed to get the clock cycles required by the execution on the Atmega328p;
 	- **[simulavr](https://www.nongnu.org/simulavr/)** : the instruction set simulator of the Atmega328p;
 	- **[avr-gcc](https://gcc.gnu.org/wiki/avr-gcc)** : the cross-compiler for the AVR ISA;
 
@@ -50,4 +48,4 @@ The simulation phase involves the execution of the toolchain of each processor s
 	- **[isasim](http://www.newit.gsu.by/resources/CPUs/i8051/VHDL/Synthesizeable%20VHDL%20Model%20of%208051.htm)** : the simulator of the 8051;
 
 
-For any bug or doubt, it is possible to contact me at: [vincenzo.stoico@graduate.univaq.it](mailto:vincenzo.stoico@graduate.univaq.it)
+For any bug or doubt, contact me at: [vincenzo.stoico@graduate.univaq.it](mailto:vincenzo.stoico@graduate.univaq.it) or open an issue

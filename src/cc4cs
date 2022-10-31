@@ -1,0 +1,189 @@
+#!/usr/bin/env python
+from GUI import GUI
+from InputsGenerator import InputsGenerator
+from Parser import Parser
+from CommandsManager import CommandsManager
+
+from os.path import dirname, realpath, abspath, isdir, isfile, join
+from os import makedirs, chdir, listdir
+from json import load
+from csv import reader, DictWriter
+from shutil import move, rmtree
+
+# Absolute path of the directory containing the configuration files 
+configsrc = dirname(realpath(__file__))
+projectPath = dirname(configsrc) + '/'
+
+# TODO: automatic switching between signed and unsigned types
+# Global Variables
+files = {
+    '8051': 'scnd.c', 'Leon3':'frst.c', 'Thumb':'thrd.c',
+    'Atmega328p':'frst.c', 'Arm':'thrd.c'
+}
+targets = ["int8_t", "int16_t", "int32_t"] # TARGET_INDEX types
+indexes = ["int8_t", "int16_t", "int32_t"] # TARGET_TYPE types
+headers = [
+    'ID', 'CInstr', 'AssemblyInstr', 'ClockCycles','ExecutionTime', 'CC4CS'
+] # headers of the output csv
+
+def loadCommands():
+# Gets the commands from cmds.json
+    with open(projectPath + 'src/cmds.json', 'r') as file:
+        content = load(file)
+    return content
+
+def getFiles(topDir, extension):
+    """This function returns the files with a specified extension
+    that are contained in topDir.
+    """
+    return [
+        f for f in listdir(topDir)
+            if isfile(join(topDir, f)) and f.endswith(extension)
+    ]
+
+def num(s):
+    try:
+        return int(s)
+    except ValueError:
+        return float(s)
+
+def calculateMetric(profPath, simPath, outputPath):
+    """The function merges the content of the files obtained from the
+    simulation and the profiling phases. Then, it writes their content
+    and the metric values in the "cc4csValues.csv" file
+
+    Args:
+        cyclesFilename (string): path of the file obtained from
+            the simulation phase
+        statementsFilename (string): path of the file obtained from the
+        profiling phase
+    """
+    with open(simPath) as cyclesFile, open(profPath) as statementsFile, \
+        open(outputPath, "w") as outputFile:
+
+        # Reads the content of the output files
+        profilingContent = reader(cyclesFile)
+        simulationContent = reader(statementsFile)
+
+        # Retrieves the headers of the output files
+        profilingHeaders = next(profilingContent)
+        simulationHeaders = next(simulationContent)
+
+        # Headers of the output file
+        headers = list(dict.fromkeys(profilingHeaders + simulationHeaders))
+        headers.append('cc4cs')
+
+        # Write Headers in the file 
+        resWriter = DictWriter(outputFile, headers)
+        resWriter.writeheader()
+
+        # Iterates thorugh the content of the files 
+        for c1, c2 in zip(profilingContent, simulationContent):
+            print(c1, c2)
+
+            op1 = num(c1[1])
+            op2 = num(c2[1])
+            # Calculates the values of the metric
+            cc4csValue = '%.3f' % (op1 / op2)
+            # Merges the data of the files
+            c1.extend(x for x in c2 if x not in c1)
+            c1.append(cc4csValue)
+            # Writes it on a file
+            resWriter.writerow(dict(zip(headers, c1)))
+
+# Start the GUI
+gui = GUI("CC4CS Calculator", "300x370") # Start GUI
+gui.fillMainWindow(projectPath + '/benchmark', gui.callback)
+gui.start()
+
+cmds = loadCommands()
+# directory containing the source file of the functions
+source = projectPath + 'benchmark/' + gui.function + '/'
+funSrc = source + files[gui.micro]
+
+inputsGen = InputsGenerator(funSrc, gui.function, gui.micro)
+cmdMan = CommandsManager(funSrc, configsrc, gui.results)
+
+for target, index in zip(targets, indexes):
+    print("#### type: ", target)
+    inputsPath = gui.results + "/includes"
+    print("input generation...", end = " ")
+    # Generates the header files, i.e. the inputs of the function
+    inputsGen.generate(inputsPath, target, index)
+    print("Done!")
+    # Executes commands needed to include configuration files of
+    # the microprocessors
+    configcmd = cmds['Configuration'].get(gui.micro)
+    if configcmd:
+        cmdMan.executeCommand(
+            cmdMan.expandCommand(configcmd, configsrc, gui.results)
+        )
+    """
+    Profiling: Gets the number of executed C statements:
+        1. retrieves the commands for profiling the function from cmds.json
+        2. for each couple (input, function) is executed on the host
+        3. the number of executed c statements is collected for each execution
+    """
+    print(
+        "retrieving executed C statements on the host platform...", end = " "
+    )
+    parser = Parser(
+        gui.results + "/cStatements.csv", Parser.gcovParser, ['id', 'cInstr']
+    ) # creates the output file and binds the parser
+
+    cmdMan.executeCommandSet(
+        cmds['Profiling'], inputsPath, parsingFunction = parser.run
+    )
+    print("Done!")
+    """
+    Simulation
+    """
+    print("simulation on the target platform...", end = " ")
+    parser = Parser(
+        gui.results + "/clockCycles.csv", Parser.PARSERS.get(gui.micro),
+        ['id', 'clockCycles', 'assemblyInstr']
+    )
+    cmdMan.executeCommandSet(
+        cmds[gui.micro], inputsPath, parsingFunction = parser.run
+    )
+    print("Done!")
+    # Creates a compact representation of the inputs
+    parser.inputParser(
+        gui.results + "/inputResume.csv", gui.results + "/includes"
+    )
+
+    print("collecting execution statistics using frama-c...", end = " ")
+    # Retrieves code metrics using FramaC
+    cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
+
+    # Builds a parser to collect Halsted statistics
+    parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
+    parser.framaParser(gui.results + "/files", 1)
+
+    # Builds a parser to collect Halsted statistics
+    parser.outputPath = gui.results + "/McCabe.csv"
+    parser.framaParser(gui.results + "/files", 0)
+    print("Done!")
+
+    print("calculating cc4s...", end = " ")
+    # Generates CC4CS file
+    calculateMetric(
+        gui.results + "/cStatements.csv", gui.results + "/clockCycles.csv",
+        "cc4csValues.csv"
+    )
+    print("Done!")
+
+    # Creates the directory in which store the results 
+    if not isdir(target):
+        makedirs(target)
+
+    files = getFiles('.', '.csv') + getFiles('.', '.txt')
+    for file in files:
+        move(file, join(target, file))
+
+    # Deletes the directory containing the inputs for the current type 
+
+#    rmtree("includes/")
+#    rmtree("files/")
+
+print("\n#### Ended! Results stored in ", gui.results)
