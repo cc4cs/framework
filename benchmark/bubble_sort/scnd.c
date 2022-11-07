@@ -2,8 +2,8 @@
 #include <8051.h>
 #include <values.h>
 
-typedef int16_t TARGET_TYPE;
-typedef int16_t TARGET_INDEX;
+typedef int8_t TARGET_TYPE;
+typedef int8_t TARGET_INDEX;
 
 void swap(TARGET_INDEX index_1, TARGET_INDEX index_2)
 {

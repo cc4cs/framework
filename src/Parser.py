@@ -171,7 +171,7 @@ class Parser:
             fileName = "McCabe.txt"
             idxEnd = None
             filesPath = inputsPath + "/values_0/" + fileName
-            params = [filesPath, idxStart, idxEnd, r'(\w+\s)+=']
+            params = [filesPath, idxStart, idxEnd, r'([a-zA-Z_]+\s)+=']   # (\w+\s)+=
 
         self.headers.extend(self.getHeaders(params, pascalCase = True))
 

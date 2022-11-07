@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<bambu_results bambu_args="bambu -I. --simulate --simulator=VERILATOR --clock-period=12 --device-name=xc7z020-1clg484-VVD frst.c " bambu_version="Version: PandA 0.9.6 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5" timestamp="2021-02-15T12:46:04" benchmark_name="main_24">
+  <CYCLES value="2480"/>
+  <HLS_execution_time value="1.06999999999999999994"/>
+</bambu_results>

@@ -1,0 +1,10 @@
+digraph G {
+0[color=blue,shape=Msquare,label="ENTRY - ENTRY"];
+1[color=blue,shape=Msquare,label="EXIT - EXIT"];
+2[color=green,shape=box,label="main_28878_29386 - make_oriented\nmake_oriented();\n\nVIRTUAL:\nUSES:\n_MEM_8279(29390)\nDEFS:\n_MEM_8280(29391)\n"];
+3[color=burlywood,shape=box,label="main_28878_29602 - addr_expr\n_8333 = a2;\n\nsource code variables:\na2(28868)\n_8333(29601)\nSCALARS:\nDEFS:\n_8333(29601)\n"];
+4[color=burlywood,shape=box,label="main_28878_29720 - nop_expr\n_8368 = (TARGET_TYPE(*)[]) (_8333);\n\nsource code variables:\n_8333(29601)\n_8368(29719)\nSCALARS:\nUSES:\n_8333(29601)\nDEFS:\n_8368(29719)\n"];
+5[color=green,shape=box,label="main_28878_29387 - astar\nastar(2u, _8368, 5u);\n\nsource code variables:\n_8368(29719)\nSCALARS:\nUSES:\n_8368(29719)\nVIRTUAL:\nUSES:\n_MEM_8280(29391)\nDEFS:\n_MEM_8281(29398)\n"];
+6[label="main_28878_29388 - gimple_return\nreturn ;\n\n"];
+2->5 [color=blue,label="_MEM_8280"];
+}

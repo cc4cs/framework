@@ -1,0 +1,11 @@
+digraph G {
+23[label="[30---30] - astar_28877_29342 - gimple_phi_FU\n/* _8273 = gimple_phi(<_8245, BB2>, <_8260, BB3>) */\n"];
+44[label="[30---30] - astar_28877_29366 - gimple_phi_FU\n/* i_lsm_76_8274 = gimple_phi(<i_lsm_76_8247, BB2>, <size, BB3>) */\n"];
+45[label="[30---30] - astar_28877_29327 - gimple_phi_FU\n/* current_lsm_77_8275 = gimple_phi(<current_lsm_77_8246, BB2>, <current_lsm_77_8259, BB3>) */\n"];
+47[label="[30---30.951] - astar_28877_29708 - ui_ne_expr_FU_8_0_8\n_8363 = _8273 != (0u);\n"];
+48[color=red,label="[30---31.114] - astar_28877_29307 - ui_plus_expr_FU_8_0_8\n_8260 = (unsigned char)(_8273 + (255u));\n"];
+49[label="[30.951---30.951] - astar_28877_29381 - read_cond_FU\nif (_8363)\n"];
+23->48 [label=0];
+23->47 [label=0];
+47->49 [label=0];
+}

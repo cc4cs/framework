@@ -1,0 +1,42 @@
+digraph G {
+//Scheduling solution
+splines=polyline;
+//Control Step: 0
+CS0 [style=plaintext]
+{rank=same; CS0 0 ;}
+//Control Step: 1
+CS1 [style=plaintext]
+{rank=same; CS1 2 3 4 ;}
+//Control Step: 2
+CS2 [style=plaintext]
+{rank=same; CS2 5 ;}
+//Control Step: 3
+CS3 [style=plaintext]
+{rank=same; CS3 6 ;}
+//Control Step: 4
+CS4 [style=plaintext]
+{rank=same; CS4 1 ;}
+CS0-> CS1;
+CS1-> CS2;
+CS2-> CS3;
+CS3-> CS4;
+0[color=blue,shape=Msquare,label="ENTRY - ENTRY"];
+1[color=blue,shape=Msquare,label="EXIT - EXIT"];
+2[color=green,shape=box,label="main_28878_29386 - make_oriented\nmake_oriented();\n"];
+3[color=burlywood,shape=box,label="main_28878_29602 - addr_expr\n_8333 = a2;\n"];
+4[color=burlywood,shape=box,label="main_28878_29720 - nop_expr\n_8368 = (TARGET_TYPE(*)[]) (_8333);\n"];
+5[color=green,shape=box,label="main_28878_29387 - astar\nastar(2u, _8368, 5u);\n"];
+6[label="main_28878_29388 - gimple_return\nreturn ;\n"];
+0->2 [color=red3,label=""];
+3->4 [color=blue, style=dotted,label="_8333"];
+4->5 [color=blue, style=dotted,label="_8368"];
+5->6 [color=red3,label=""];
+0->3 [color=red3,label=""];
+0->4 [color=red3,label=""];
+0->5 [color=red3,label=""];
+0->6 [color=red3,label=""];
+2->6 [color=red3,label=""];
+3->6 [color=red3,label=""];
+4->6 [color=red3,label=""];
+2->5 [color=blue,label="_MEM_8280"];
+}

@@ -1,0 +1,11 @@
+P0	P1	P2	P3
+0xFF	0xFF	0xFF	0xFF
+
+Instructions Executed:                       9126537219
+Execution Time(seconds):                     194.39
+Average Instructions/second:                 4.69497e+07
+
+Clock Cycles Required for 8051:              149706440088
+Execution Time for 8051(12 MHz)(seconds):    12475.5
+Average Instructions/second for 8051:        731555
+

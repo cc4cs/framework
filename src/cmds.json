@@ -12,18 +12,16 @@
 	},
 
 	"Atmega328p": {
-		"mergeFiles" : "cat [functionName]Sim.txt [functionName]Moved {[functionName].txt}",
-		"moveString" : "sed /instructions:/{s///;s/^/instructions:/;} [functionName]Trace {[functionName]Moved}",
-		"stat" : "perf stat -e instructions: -o [functionName]Trace [functionName] ",
-		"iss": "simulavr -f [functionName] -d atmega328 -T exit {[functionName].txt}",
-		"compiler": "avr-gcc [functionPath] -g -mmcu=atmega329 -I[prjPath]includes/[directoryName] -o [functionName]",
-		"dependencies": "compiler iss"
-	},
+          "iss": "simulavr -f [functionName] -d atmega328 -T exit {[functionName].txt}",
+          "compiler": "avr-gcc [functionPath] -g -mmcu=atmega329 -I[prjPath]includes/[directoryName] -o [functionName]",
+          "dependencies": "compiler iss"
+     },
 
 	"Leon3": {
+		"additionalFile": "cp [scriptPath]/tsim_cmd [prjPath]includes/",
 		"iss": "tsim-leon3 [functionName] -c [prjPath]includes/tsim_cmd {[functionName].txt}",
 		"compiler":"sparc-gaisler-elf-gcc [functionPath] -o0 -I[prjPath]includes/[directoryName] -o [functionName]",
-		"dependencies": "compiler iss"
+		"dependencies": "additionalFile compiler iss"
 	},
 
 	"8051": {
@@ -36,16 +34,15 @@
 	"Thumb": {
 		"vectors": "arm-none-eabi-as [functionDir]/vectors.s -o [functionDir]/vectors.o",
 		"compiler": "arm-none-eabi-gcc -mthumb -c -I[prjPath]includes/[directoryName] -o [functionName].o [functionPath]",
-		"linking": "arm-none-eabi-ld -T [functionDir]/memmap [functionDir]/vectors.o [functionName].o -o [functionName].elf",
+		"linking": "arm-none-eabi-ld -L/usr/lib/gcc/arm-none-eabi/10.3.1/libgcc.a -T [functionDir]/memmap [functionDir]/vectors.o [functionName].o -o [functionName].elf",
 		"binary": "arm-none-eabi-objcopy -O binary [functionName].elf [functionName].bin",
 		"iss": "thumbulator [functionName].bin {[functionName].txt}",
 		"dependencies": "vectors compiler linking binary iss"
 	},
 
 	"Arm": {
-		"rip" : "gcc [functionDir]/rip.c -o [functionDir]/rip",
 		"compiler": "arm-none-eabi-gcc -march=armv4t -c [functionPath] -I[prjPath]includes/[directoryName] -o [functionDir]/[functionName].o",
-		"linking": "arm-none-eabi-ld [functionDir]/startup.o [functionDir]/[functionName].o -o [functionDir]/[functionName].elf -T [functionDir]/arm-memmap.ld",
+		"linking": "arm-none-eabi-ld -L/usr/lib/arm-none-eabi/lib/arm/v5te/softfp/libm.a [functionDir]/startup.o [functionDir]/[functionName].o -o [functionDir]/[functionName].elf -T [functionDir]/arm-memmap.ld",
 		"startup":"arm-none-eabi-as [functionDir]/startup.s -o [functionDir]/startup.o",
 		"binary":"[functionDir]/rip [functionDir]/[functionName].elf",
 		"iss":"armulator [functionDir]/00000000.bin {[functionName].txt}",

@@ -1,0 +1,8 @@
+graph G {
+0[label="astar_28877_29274(LOAD)"];
+1[label="astar_28877_29355(STORE)"];
+2[label="astar_28877_29371(STORE)"];
+0--1 [label="8"];
+0--2 [label="8"];
+1--2 [label="8"];
+}

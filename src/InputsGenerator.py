@@ -161,6 +161,7 @@ class InputsGenerator:
                 fdHeader.write("#endif")
             # Moves the file in the created directory  
             rename("values.h", dirName + "/values.h")
+            
             idxFile += 1
 
         # Returns to the previous directory

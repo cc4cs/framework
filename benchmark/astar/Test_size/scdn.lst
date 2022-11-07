@@ -1,0 +1,950 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.5.0 #9253 (Mar 24 2016) (Linux)
+                                      4 ; This file was generated Fri Feb 12 20:22:10 2021
+                                      5 ;--------------------------------------------------------
+                                      6 	.module scdn
+                                      7 	.optsdcc -mmcs51 --model-small
+                                      8 	
+                                      9 ;--------------------------------------------------------
+                                     10 ; Public variables in this module
+                                     11 ;--------------------------------------------------------
+                                     12 	.globl _main
+                                     13 	.globl _astar
+                                     14 	.globl _heuristic
+                                     15 	.globl _absolute
+                                     16 	.globl _set_estimates
+                                     17 	.globl _remove_min
+                                     18 	.globl _insert
+                                     19 	.globl _init_camefrom
+                                     20 	.globl _make_oriented
+                                     21 	.globl _resetValues
+                                     22 	.globl _j
+                                     23 	.globl _i
+                                     24 	.globl _priority
+                                     25 	.globl _current
+                                     26 	.globl _came_from
+                                     27 	.globl _frontier_size
+                                     28 	.globl _frontier
+                                     29 	.globl _a
+                                     30 	.globl _P3
+                                     31 	.globl _P2
+                                     32 	.globl _P1
+                                     33 	.globl _P0
+                                     34 ;--------------------------------------------------------
+                                     35 ; special function registers
+                                     36 ;--------------------------------------------------------
+                                     37 	.area RSEG    (ABS,DATA)
+      000000                         38 	.org 0x0000
+                                     39 ;--------------------------------------------------------
+                                     40 ; special function bits
+                                     41 ;--------------------------------------------------------
+                                     42 	.area RSEG    (ABS,DATA)
+      000000                         43 	.org 0x0000
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+      000000                         53 _P0::
+      000000                         54 	.ds 2
+      000002                         55 _P1::
+      000002                         56 	.ds 2
+      000004                         57 _P2::
+      000004                         58 	.ds 2
+      000006                         59 _P3::
+      000006                         60 	.ds 2
+      000008                         61 _a::
+      000008                         62 	.ds 16
+      000018                         63 _frontier::
+      000018                         64 	.ds 4
+      00001C                         65 _frontier_size::
+      00001C                         66 	.ds 1
+      00001D                         67 _came_from::
+      00001D                         68 	.ds 4
+      000021                         69 _current::
+      000021                         70 	.ds 1
+      000022                         71 _priority::
+      000022                         72 	.ds 1
+      000023                         73 _i::
+      000023                         74 	.ds 1
+      000024                         75 _j::
+      000024                         76 	.ds 1
+                                     77 ;--------------------------------------------------------
+                                     78 ; overlayable items in internal ram 
+                                     79 ;--------------------------------------------------------
+                                     80 ;--------------------------------------------------------
+                                     81 ; Stack segment in internal ram 
+                                     82 ;--------------------------------------------------------
+                                     83 	.area	SSEG
+      000000                         84 __start__stack:
+      000000                         85 	.ds	1
+                                     86 
+                                     87 ;--------------------------------------------------------
+                                     88 ; indirectly addressable internal ram data
+                                     89 ;--------------------------------------------------------
+                                     90 	.area ISEG    (DATA)
+                                     91 ;--------------------------------------------------------
+                                     92 ; absolute internal ram data
+                                     93 ;--------------------------------------------------------
+                                     94 	.area IABS    (ABS,DATA)
+                                     95 	.area IABS    (ABS,DATA)
+                                     96 ;--------------------------------------------------------
+                                     97 ; bit data
+                                     98 ;--------------------------------------------------------
+                                     99 	.area BSEG    (BIT)
+                                    100 ;--------------------------------------------------------
+                                    101 ; paged external ram data
+                                    102 ;--------------------------------------------------------
+                                    103 	.area PSEG    (PAG,XDATA)
+                                    104 ;--------------------------------------------------------
+                                    105 ; external ram data
+                                    106 ;--------------------------------------------------------
+                                    107 	.area XSEG    (XDATA)
+                                    108 ;--------------------------------------------------------
+                                    109 ; absolute external ram data
+                                    110 ;--------------------------------------------------------
+                                    111 	.area XABS    (ABS,XDATA)
+                                    112 ;--------------------------------------------------------
+                                    113 ; external initialized ram data
+                                    114 ;--------------------------------------------------------
+                                    115 	.area XISEG   (XDATA)
+                                    116 	.area HOME    (CODE)
+                                    117 	.area GSINIT0 (CODE)
+                                    118 	.area GSINIT1 (CODE)
+                                    119 	.area GSINIT2 (CODE)
+                                    120 	.area GSINIT3 (CODE)
+                                    121 	.area GSINIT4 (CODE)
+                                    122 	.area GSINIT5 (CODE)
+                                    123 	.area GSINIT  (CODE)
+                                    124 	.area GSFINAL (CODE)
+                                    125 	.area CSEG    (CODE)
+                                    126 ;--------------------------------------------------------
+                                    127 ; interrupt vector 
+                                    128 ;--------------------------------------------------------
+                                    129 	.area HOME    (CODE)
+      000000                        130 __interrupt_vect:
+      000000 02r00r00         [24]  131 	ljmp	__sdcc_gsinit_startup
+                                    132 ;--------------------------------------------------------
+                                    133 ; global & static initialisations
+                                    134 ;--------------------------------------------------------
+                                    135 	.area HOME    (CODE)
+                                    136 	.area GSINIT  (CODE)
+                                    137 	.area GSFINAL (CODE)
+                                    138 	.area GSINIT  (CODE)
+                                    139 	.globl __sdcc_gsinit_startup
+                                    140 	.globl __sdcc_program_startup
+                                    141 	.globl __start__stack
+                                    142 	.globl __mcs51_genXINIT
+                                    143 	.globl __mcs51_genXRAMCLEAR
+                                    144 	.globl __mcs51_genRAMCLEAR
+                                    145 ;	./values_8051.h:5: int8_t a[size][size] = {{-93, 107, 12, -113},{-4, 80, 11, 51},{19, 51, 54, 65},{42, 121, -123, -110}};
+      000000 75*08 A3         [24]  146 	mov	_a,#0xA3
+      000003 75*09 6B         [24]  147 	mov	(_a + 0x0001),#0x6B
+      000006 75*0A 0C         [24]  148 	mov	(_a + 0x0002),#0x0C
+      000009 75*0B 8F         [24]  149 	mov	(_a + 0x0003),#0x8F
+      00000C 75*0C FC         [24]  150 	mov	(_a + 0x0004),#0xFC
+      00000F 75*0D 50         [24]  151 	mov	(_a + 0x0005),#0x50
+      000012 75*0E 0B         [24]  152 	mov	(_a + 0x0006),#0x0B
+      000015 75*0F 33         [24]  153 	mov	(_a + 0x0007),#0x33
+      000018 75*10 13         [24]  154 	mov	(_a + 0x0008),#0x13
+      00001B 75*11 33         [24]  155 	mov	(_a + 0x0009),#0x33
+      00001E 75*12 36         [24]  156 	mov	(_a + 0x000a),#0x36
+      000021 75*13 41         [24]  157 	mov	(_a + 0x000b),#0x41
+      000024 75*14 2A         [24]  158 	mov	(_a + 0x000c),#0x2A
+      000027 75*15 79         [24]  159 	mov	(_a + 0x000d),#0x79
+      00002A 75*16 85         [24]  160 	mov	(_a + 0x000e),#0x85
+      00002D 75*17 92         [24]  161 	mov	(_a + 0x000f),#0x92
+                                    162 ;	scdn.c:11: TARGET_TYPE frontier_size = 0;
+      000030 75*1C 00         [24]  163 	mov	_frontier_size,#0x00
+                                    164 ;	scdn.c:14: TARGET_INDEX current = 0;
+      000033 75*21 00         [24]  165 	mov	_current,#0x00
+                                    166 ;	scdn.c:16: TARGET_TYPE priority = 0;
+      000036 75*22 00         [24]  167 	mov	_priority,#0x00
+                                    168 	.area GSFINAL (CODE)
+      000000 02r00r03         [24]  169 	ljmp	__sdcc_program_startup
+                                    170 ;--------------------------------------------------------
+                                    171 ; Home
+                                    172 ;--------------------------------------------------------
+                                    173 	.area HOME    (CODE)
+                                    174 	.area HOME    (CODE)
+      000003                        175 __sdcc_program_startup:
+      000003 02r03rA3         [24]  176 	ljmp	_main
+                                    177 ;	return from main will return to caller
+                                    178 ;--------------------------------------------------------
+                                    179 ; code
+                                    180 ;--------------------------------------------------------
+                                    181 	.area CSEG    (CODE)
+                                    182 ;------------------------------------------------------------
+                                    183 ;Allocation info for local variables in function 'resetValues'
+                                    184 ;------------------------------------------------------------
+                                    185 ;	scdn.c:20: void resetValues()
+                                    186 ;	-----------------------------------------
+                                    187 ;	 function resetValues
+                                    188 ;	-----------------------------------------
+      000000                        189 _resetValues:
+                           000007   190 	ar7 = 0x07
+                           000006   191 	ar6 = 0x06
+                           000005   192 	ar5 = 0x05
+                           000004   193 	ar4 = 0x04
+                           000003   194 	ar3 = 0x03
+                           000002   195 	ar2 = 0x02
+                           000001   196 	ar1 = 0x01
+                           000000   197 	ar0 = 0x00
+                                    198 ;	scdn.c:22: P0 = 0;
+      000000 E4               [12]  199 	clr	a
+      000001 F5*00            [12]  200 	mov	_P0,a
+      000003 F5*01            [12]  201 	mov	(_P0 + 1),a
+                                    202 ;	scdn.c:23: P1 = 0;
+      000005 F5*02            [12]  203 	mov	_P1,a
+      000007 F5*03            [12]  204 	mov	(_P1 + 1),a
+                                    205 ;	scdn.c:24: P2 = 0;
+      000009 F5*04            [12]  206 	mov	_P2,a
+      00000B F5*05            [12]  207 	mov	(_P2 + 1),a
+                                    208 ;	scdn.c:25: P3 = 0;
+      00000D F5*06            [12]  209 	mov	_P3,a
+      00000F F5*07            [12]  210 	mov	(_P3 + 1),a
+      000011 22               [24]  211 	ret
+                                    212 ;------------------------------------------------------------
+                                    213 ;Allocation info for local variables in function 'make_oriented'
+                                    214 ;------------------------------------------------------------
+                                    215 ;	scdn.c:67: void make_oriented()
+                                    216 ;	-----------------------------------------
+                                    217 ;	 function make_oriented
+                                    218 ;	-----------------------------------------
+      000012                        219 _make_oriented:
+                                    220 ;	scdn.c:69: for(i = 0; 
+      000012 75*23 00         [24]  221 	mov	_i,#0x00
+      000015                        222 00112$:
+                                    223 ;	scdn.c:73: a[i][i] = -1;
+      000015 E5*23            [12]  224 	mov	a,_i
+      000017 25*23            [12]  225 	add	a,_i
+      000019 25 E0            [12]  226 	add	a,acc
+      00001B 24r08            [12]  227 	add	a,#_a
+      00001D FF               [12]  228 	mov	r7,a
+      00001E 25*23            [12]  229 	add	a,_i
+      000020 F8               [12]  230 	mov	r0,a
+      000021 76 FF            [12]  231 	mov	@r0,#0xFF
+                                    232 ;	scdn.c:76: a[size-1][i] = -1;
+      000023 E5*23            [12]  233 	mov	a,_i
+      000025 24r14            [12]  234 	add	a,#(_a + 0x000c)
+      000027 F8               [12]  235 	mov	r0,a
+      000028 76 FF            [12]  236 	mov	@r0,#0xFF
+                                    237 ;	scdn.c:78: for(j = 0; 
+      00002A 75*24 00         [24]  238 	mov	_j,#0x00
+      00002D                        239 00110$:
+                                    240 ;	scdn.c:82: if(a[i][j] < 0
+      00002D E5*23            [12]  241 	mov	a,_i
+      00002F 25*23            [12]  242 	add	a,_i
+      000031 25 E0            [12]  243 	add	a,acc
+      000033 FF               [12]  244 	mov	r7,a
+      000034 24r08            [12]  245 	add	a,#_a
+      000036 25*24            [12]  246 	add	a,_j
+      000038 F9               [12]  247 	mov	r1,a
+      000039 E7               [12]  248 	mov	a,@r1
+      00003A FE               [12]  249 	mov	r6,a
+      00003B 30 E7 35         [24]  250 	jnb	acc.7,00104$
+                                    251 ;	scdn.c:84: && a[i][j] != -1 )
+      00003E E5*24            [12]  252 	mov	a,_j
+      000040 B5*23 02         [24]  253 	cjne	a,_i,00138$
+      000043 80 2E            [24]  254 	sjmp	00104$
+      000045                        255 00138$:
+      000045 EF               [12]  256 	mov	a,r7
+      000046 24r08            [12]  257 	add	a,#_a
+      000048 25*24            [12]  258 	add	a,_j
+      00004A F9               [12]  259 	mov	r1,a
+      00004B 87 06            [24]  260 	mov	ar6,@r1
+      00004D BE FF 02         [24]  261 	cjne	r6,#0xFF,00139$
+      000050 80 21            [24]  262 	sjmp	00104$
+      000052                        263 00139$:
+                                    264 ;	scdn.c:86: a[i][j] *= -1;
+      000052 EF               [12]  265 	mov	a,r7
+      000053 24r08            [12]  266 	add	a,#_a
+      000055 FF               [12]  267 	mov	r7,a
+      000056 25*24            [12]  268 	add	a,_j
+      000058 F9               [12]  269 	mov	r1,a
+      000059 E5*24            [12]  270 	mov	a,_j
+      00005B 2F               [12]  271 	add	a,r7
+      00005C F8               [12]  272 	mov	r0,a
+      00005D 86 07            [24]  273 	mov	ar7,@r0
+      00005F C3               [12]  274 	clr	c
+      000060 E4               [12]  275 	clr	a
+      000061 9F               [12]  276 	subb	a,r7
+      000062 F7               [12]  277 	mov	@r1,a
+                                    278 ;	scdn.c:87: a[j][i] = -1;
+      000063 E5*24            [12]  279 	mov	a,_j
+      000065 25*24            [12]  280 	add	a,_j
+      000067 25 E0            [12]  281 	add	a,acc
+      000069 24r08            [12]  282 	add	a,#_a
+      00006B FF               [12]  283 	mov	r7,a
+      00006C 25*23            [12]  284 	add	a,_i
+      00006E F8               [12]  285 	mov	r0,a
+      00006F 76 FF            [12]  286 	mov	@r0,#0xFF
+      000071 80 1E            [24]  287 	sjmp	00111$
+      000073                        288 00104$:
+                                    289 ;	scdn.c:92: if(a[j][i] >= 0)
+      000073 E5*24            [12]  290 	mov	a,_j
+      000075 25*24            [12]  291 	add	a,_j
+      000077 25 E0            [12]  292 	add	a,acc
+      000079 24r08            [12]  293 	add	a,#_a
+      00007B 25*23            [12]  294 	add	a,_i
+      00007D F9               [12]  295 	mov	r1,a
+      00007E E7               [12]  296 	mov	a,@r1
+      00007F FF               [12]  297 	mov	r7,a
+      000080 20 E7 0E         [24]  298 	jb	acc.7,00111$
+                                    299 ;	scdn.c:93: a[i][j] = -1;
+      000083 E5*23            [12]  300 	mov	a,_i
+      000085 25*23            [12]  301 	add	a,_i
+      000087 25 E0            [12]  302 	add	a,acc
+      000089 24r08            [12]  303 	add	a,#_a
+      00008B FF               [12]  304 	mov	r7,a
+      00008C 25*24            [12]  305 	add	a,_j
+      00008E F8               [12]  306 	mov	r0,a
+      00008F 76 FF            [12]  307 	mov	@r0,#0xFF
+      000091                        308 00111$:
+                                    309 ;	scdn.c:80: j++)
+      000091 05*24            [12]  310 	inc	_j
+                                    311 ;	scdn.c:79: j < size; 
+      000093 74 FC            [12]  312 	mov	a,#0x100 - 0x04
+      000095 25*24            [12]  313 	add	a,_j
+      000097 40 03            [24]  314 	jc	00141$
+      000099 02r00r2D         [24]  315 	ljmp	00110$
+      00009C                        316 00141$:
+                                    317 ;	scdn.c:71: i++)
+      00009C 05*23            [12]  318 	inc	_i
+                                    319 ;	scdn.c:70: i < size; 
+      00009E 74 FC            [12]  320 	mov	a,#0x100 - 0x04
+      0000A0 25*23            [12]  321 	add	a,_i
+      0000A2 40 03            [24]  322 	jc	00142$
+      0000A4 02r00r15         [24]  323 	ljmp	00112$
+      0000A7                        324 00142$:
+      0000A7 22               [24]  325 	ret
+                                    326 ;------------------------------------------------------------
+                                    327 ;Allocation info for local variables in function 'init_camefrom'
+                                    328 ;------------------------------------------------------------
+                                    329 ;	scdn.c:100: void init_camefrom()
+                                    330 ;	-----------------------------------------
+                                    331 ;	 function init_camefrom
+                                    332 ;	-----------------------------------------
+      0000A8                        333 _init_camefrom:
+                                    334 ;	scdn.c:102: for(i = 0;
+      0000A8 75*23 00         [24]  335 	mov	_i,#0x00
+      0000AB                        336 00102$:
+                                    337 ;	scdn.c:105: came_from[i] = -1;
+      0000AB E5*23            [12]  338 	mov	a,_i
+      0000AD 24r1D            [12]  339 	add	a,#_came_from
+      0000AF F8               [12]  340 	mov	r0,a
+      0000B0 76 FF            [12]  341 	mov	@r0,#0xFF
+                                    342 ;	scdn.c:104: i++)
+      0000B2 05*23            [12]  343 	inc	_i
+                                    344 ;	scdn.c:103: i < size;
+      0000B4 74 FC            [12]  345 	mov	a,#0x100 - 0x04
+      0000B6 25*23            [12]  346 	add	a,_i
+      0000B8 50 F1            [24]  347 	jnc	00102$
+      0000BA 22               [24]  348 	ret
+                                    349 ;------------------------------------------------------------
+                                    350 ;Allocation info for local variables in function 'insert'
+                                    351 ;------------------------------------------------------------
+                                    352 ;priority                  Allocated to stack - _bp -3
+                                    353 ;node                      Allocated to registers r7 
+                                    354 ;------------------------------------------------------------
+                                    355 ;	scdn.c:108: void insert(TARGET_INDEX node, TARGET_TYPE priority)
+                                    356 ;	-----------------------------------------
+                                    357 ;	 function insert
+                                    358 ;	-----------------------------------------
+      0000BB                        359 _insert:
+      0000BB C0*00            [24]  360 	push	_bp
+      0000BD 85 81*00         [24]  361 	mov	_bp,sp
+                                    362 ;	scdn.c:110: frontier[node] = priority;
+      0000C0 E5 82            [12]  363 	mov	a,dpl
+      0000C2 24r18            [12]  364 	add	a,#_frontier
+      0000C4 F8               [12]  365 	mov	r0,a
+      0000C5 E5*00            [12]  366 	mov	a,_bp
+      0000C7 24 FD            [12]  367 	add	a,#0xfd
+      0000C9 F9               [12]  368 	mov	r1,a
+      0000CA E7               [12]  369 	mov	a,@r1
+      0000CB F6               [12]  370 	mov	@r0,a
+                                    371 ;	scdn.c:111: ++frontier_size;
+      0000CC 05*1C            [12]  372 	inc	_frontier_size
+      0000CE D0*00            [24]  373 	pop	_bp
+      0000D0 22               [24]  374 	ret
+                                    375 ;------------------------------------------------------------
+                                    376 ;Allocation info for local variables in function 'remove_min'
+                                    377 ;------------------------------------------------------------
+                                    378 ;min                       Allocated to registers r7 
+                                    379 ;------------------------------------------------------------
+                                    380 ;	scdn.c:114: void remove_min()
+                                    381 ;	-----------------------------------------
+                                    382 ;	 function remove_min
+                                    383 ;	-----------------------------------------
+      0000D1                        384 _remove_min:
+                                    385 ;	scdn.c:116: TARGET_TYPE min = 127;
+      0000D1 7F 7F            [12]  386 	mov	r7,#0x7F
+                                    387 ;	scdn.c:118: for(i  = 0;
+      0000D3 75*23 00         [24]  388 	mov	_i,#0x00
+      0000D6                        389 00105$:
+                                    390 ;	scdn.c:122: if(frontier[i] <= min && 
+      0000D6 E5*23            [12]  391 	mov	a,_i
+      0000D8 24r18            [12]  392 	add	a,#_frontier
+      0000DA F9               [12]  393 	mov	r1,a
+      0000DB 87 06            [24]  394 	mov	ar6,@r1
+      0000DD C3               [12]  395 	clr	c
+      0000DE EF               [12]  396 	mov	a,r7
+      0000DF 64 80            [12]  397 	xrl	a,#0x80
+      0000E1 8E F0            [24]  398 	mov	b,r6
+      0000E3 63 F0 80         [24]  399 	xrl	b,#0x80
+      0000E6 95 F0            [12]  400 	subb	a,b
+      0000E8 40 08            [24]  401 	jc	00106$
+                                    402 ;	scdn.c:123: frontier[i] != 0)
+      0000EA EE               [12]  403 	mov	a,r6
+      0000EB 60 05            [24]  404 	jz	00106$
+                                    405 ;	scdn.c:125: min = frontier[i];
+      0000ED 8E 07            [24]  406 	mov	ar7,r6
+                                    407 ;	scdn.c:126: current = i;
+      0000EF 85*23*21         [24]  408 	mov	_current,_i
+      0000F2                        409 00106$:
+                                    410 ;	scdn.c:120: i++)
+      0000F2 05*23            [12]  411 	inc	_i
+                                    412 ;	scdn.c:119: i < size; 
+      0000F4 74 FC            [12]  413 	mov	a,#0x100 - 0x04
+      0000F6 25*23            [12]  414 	add	a,_i
+      0000F8 50 DC            [24]  415 	jnc	00105$
+                                    416 ;	scdn.c:130: --frontier_size;
+      0000FA 15*1C            [12]  417 	dec	_frontier_size
+                                    418 ;	scdn.c:131: frontier[current] = 0;
+      0000FC E5*21            [12]  419 	mov	a,_current
+      0000FE 24r18            [12]  420 	add	a,#_frontier
+      000100 F8               [12]  421 	mov	r0,a
+      000101 76 00            [12]  422 	mov	@r0,#0x00
+      000103 22               [24]  423 	ret
+                                    424 ;------------------------------------------------------------
+                                    425 ;Allocation info for local variables in function 'set_estimates'
+                                    426 ;------------------------------------------------------------
+                                    427 ;	scdn.c:134: void set_estimates()
+                                    428 ;	-----------------------------------------
+                                    429 ;	 function set_estimates
+                                    430 ;	-----------------------------------------
+      000104                        431 _set_estimates:
+                                    432 ;	scdn.c:136: for(i = 0; 
+      000104 75*23 00         [24]  433 	mov	_i,#0x00
+      000107                        434 00105$:
+                                    435 ;	scdn.c:140: if(i == 0)
+      000107 E5*23            [12]  436 	mov	a,_i
+                                    437 ;	scdn.c:141: a[0][0] = 0;
+      000109 70 04            [24]  438 	jnz	00102$
+      00010B F5*08            [12]  439 	mov	_a,a
+      00010D 80 0E            [24]  440 	sjmp	00106$
+      00010F                        441 00102$:
+                                    442 ;	scdn.c:143: a[i][i] = 127;
+      00010F E5*23            [12]  443 	mov	a,_i
+      000111 25*23            [12]  444 	add	a,_i
+      000113 25 E0            [12]  445 	add	a,acc
+      000115 24r08            [12]  446 	add	a,#_a
+      000117 FF               [12]  447 	mov	r7,a
+      000118 25*23            [12]  448 	add	a,_i
+      00011A F8               [12]  449 	mov	r0,a
+      00011B 76 7F            [12]  450 	mov	@r0,#0x7F
+      00011D                        451 00106$:
+                                    452 ;	scdn.c:138: i++)
+      00011D 05*23            [12]  453 	inc	_i
+                                    454 ;	scdn.c:137: i < size; 
+      00011F 74 FC            [12]  455 	mov	a,#0x100 - 0x04
+      000121 25*23            [12]  456 	add	a,_i
+      000123 50 E2            [24]  457 	jnc	00105$
+      000125 22               [24]  458 	ret
+                                    459 ;------------------------------------------------------------
+                                    460 ;Allocation info for local variables in function 'absolute'
+                                    461 ;------------------------------------------------------------
+                                    462 ;n                         Allocated to registers r7 
+                                    463 ;------------------------------------------------------------
+                                    464 ;	scdn.c:148: TARGET_TYPE absolute(TARGET_TYPE n)
+                                    465 ;	-----------------------------------------
+                                    466 ;	 function absolute
+                                    467 ;	-----------------------------------------
+      000126                        468 _absolute:
+      000126 AF 82            [24]  469 	mov	r7,dpl
+                                    470 ;	scdn.c:150: return n > 0 ? n : -n; 
+      000128 C3               [12]  471 	clr	c
+      000129 74 80            [12]  472 	mov	a,#(0x00 ^ 0x80)
+      00012B 8F F0            [24]  473 	mov	b,r7
+      00012D 63 F0 80         [24]  474 	xrl	b,#0x80
+      000130 95 F0            [12]  475 	subb	a,b
+      000132 50 04            [24]  476 	jnc	00103$
+      000134 8F 06            [24]  477 	mov	ar6,r7
+      000136 80 04            [24]  478 	sjmp	00104$
+      000138                        479 00103$:
+      000138 C3               [12]  480 	clr	c
+      000139 E4               [12]  481 	clr	a
+      00013A 9F               [12]  482 	subb	a,r7
+      00013B FE               [12]  483 	mov	r6,a
+      00013C                        484 00104$:
+      00013C 8E 82            [24]  485 	mov	dpl,r6
+      00013E 22               [24]  486 	ret
+                                    487 ;------------------------------------------------------------
+                                    488 ;Allocation info for local variables in function 'heuristic'
+                                    489 ;------------------------------------------------------------
+                                    490 ;current                   Allocated to stack - _bp -3
+                                    491 ;path_cost                 Allocated to stack - _bp -4
+                                    492 ;goal                      Allocated to registers r7 
+                                    493 ;------------------------------------------------------------
+                                    494 ;	scdn.c:153: TARGET_TYPE heuristic(TARGET_INDEX goal, TARGET_INDEX current, TARGET_TYPE path_cost)
+                                    495 ;	-----------------------------------------
+                                    496 ;	 function heuristic
+                                    497 ;	-----------------------------------------
+      00013F                        498 _heuristic:
+      00013F C0*00            [24]  499 	push	_bp
+      000141 85 81*00         [24]  500 	mov	_bp,sp
+      000144 AF 82            [24]  501 	mov	r7,dpl
+                                    502 ;	scdn.c:156: if(a[current][goal] > -1) 
+      000146 E5*00            [12]  503 	mov	a,_bp
+      000148 24 FD            [12]  504 	add	a,#0xfd
+      00014A F8               [12]  505 	mov	r0,a
+      00014B E6               [12]  506 	mov	a,@r0
+      00014C 25 E0            [12]  507 	add	a,acc
+      00014E 25 E0            [12]  508 	add	a,acc
+      000150 24r08            [12]  509 	add	a,#_a
+      000152 FE               [12]  510 	mov	r6,a
+      000153 2F               [12]  511 	add	a,r7
+      000154 F9               [12]  512 	mov	r1,a
+      000155 87 07            [24]  513 	mov	ar7,@r1
+      000157 C3               [12]  514 	clr	c
+      000158 74 7F            [12]  515 	mov	a,#(0xFF ^ 0x80)
+      00015A 8F F0            [24]  516 	mov	b,r7
+      00015C 63 F0 80         [24]  517 	xrl	b,#0x80
+      00015F 95 F0            [12]  518 	subb	a,b
+      000161 50 05            [24]  519 	jnc	00102$
+                                    520 ;	scdn.c:157: return 1;
+      000163 75 82 01         [24]  521 	mov	dpl,#0x01
+      000166 80 1F            [24]  522 	sjmp	00103$
+      000168                        523 00102$:
+                                    524 ;	scdn.c:161: return absolute((int8_t)0 - (size/2)) + absolute(path_cost - (size/2));
+      000168 75 82 FE         [24]  525 	mov	dpl,#0xFE
+      00016B 12r01r26         [24]  526 	lcall	_absolute
+      00016E AF 82            [24]  527 	mov	r7,dpl
+      000170 E5*00            [12]  528 	mov	a,_bp
+      000172 24 FC            [12]  529 	add	a,#0xfc
+      000174 F8               [12]  530 	mov	r0,a
+      000175 E6               [12]  531 	mov	a,@r0
+      000176 24 FE            [12]  532 	add	a,#0xFE
+      000178 F5 82            [12]  533 	mov	dpl,a
+      00017A C0 07            [24]  534 	push	ar7
+      00017C 12r01r26         [24]  535 	lcall	_absolute
+      00017F AE 82            [24]  536 	mov	r6,dpl
+      000181 D0 07            [24]  537 	pop	ar7
+      000183 EE               [12]  538 	mov	a,r6
+      000184 2F               [12]  539 	add	a,r7
+      000185 F5 82            [12]  540 	mov	dpl,a
+      000187                        541 00103$:
+      000187 D0*00            [24]  542 	pop	_bp
+      000189 22               [24]  543 	ret
+                                    544 ;------------------------------------------------------------
+                                    545 ;Allocation info for local variables in function 'astar'
+                                    546 ;------------------------------------------------------------
+                                    547 ;goal                      Allocated to stack - _bp -3
+                                    548 ;a                         Allocated to stack - _bp -6
+                                    549 ;size                      Allocated to registers r7 
+                                    550 ;sloc0                     Allocated to stack - _bp +1
+                                    551 ;sloc1                     Allocated to stack - _bp +4
+                                    552 ;------------------------------------------------------------
+                                    553 ;	scdn.c:164: void astar(TARGET_INDEX size, TARGET_INDEX goal, TARGET_TYPE a[size][size])
+                                    554 ;	-----------------------------------------
+                                    555 ;	 function astar
+                                    556 ;	-----------------------------------------
+      00018A                        557 _astar:
+      00018A C0*00            [24]  558 	push	_bp
+      00018C E5 81            [12]  559 	mov	a,sp
+      00018E F5*00            [12]  560 	mov	_bp,a
+      000190 24 05            [12]  561 	add	a,#0x05
+      000192 F5 81            [12]  562 	mov	sp,a
+      000194 AF 82            [24]  563 	mov	r7,dpl
+                                    564 ;	scdn.c:166: set_estimates();
+      000196 C0 07            [24]  565 	push	ar7
+      000198 12r01r04         [24]  566 	lcall	_set_estimates
+                                    567 ;	scdn.c:167: insert(0,0);
+      00019B E4               [12]  568 	clr	a
+      00019C C0 E0            [24]  569 	push	acc
+      00019E 75 82 00         [24]  570 	mov	dpl,#0x00
+      0001A1 12r00rBB         [24]  571 	lcall	_insert
+      0001A4 15 81            [12]  572 	dec	sp
+      0001A6 D0 07            [24]  573 	pop	ar7
+                                    574 ;	scdn.c:169: while(frontier_size > 0)
+      0001A8                        575 00107$:
+      0001A8 C3               [12]  576 	clr	c
+      0001A9 74 80            [12]  577 	mov	a,#(0x00 ^ 0x80)
+      0001AB 85*1C F0         [24]  578 	mov	b,_frontier_size
+      0001AE 63 F0 80         [24]  579 	xrl	b,#0x80
+      0001B1 95 F0            [12]  580 	subb	a,b
+      0001B3 40 03            [24]  581 	jc	00136$
+      0001B5 02r03r9D         [24]  582 	ljmp	00113$
+      0001B8                        583 00136$:
+                                    584 ;	scdn.c:171: remove_min();
+      0001B8 C0 07            [24]  585 	push	ar7
+      0001BA 12r00rD1         [24]  586 	lcall	_remove_min
+      0001BD D0 07            [24]  587 	pop	ar7
+                                    588 ;	scdn.c:173: if(current == goal)
+      0001BF E5*00            [12]  589 	mov	a,_bp
+      0001C1 24 FD            [12]  590 	add	a,#0xfd
+      0001C3 F8               [12]  591 	mov	r0,a
+      0001C4 E6               [12]  592 	mov	a,@r0
+      0001C5 B5*21 03         [24]  593 	cjne	a,_current,00137$
+      0001C8 02r03r9D         [24]  594 	ljmp	00113$
+      0001CB                        595 00137$:
+                                    596 ;	scdn.c:176: for(i = 0; 
+      0001CB 75*23 00         [24]  597 	mov	_i,#0x00
+      0001CE                        598 00111$:
+                                    599 ;	scdn.c:177: i < size; 
+      0001CE C3               [12]  600 	clr	c
+      0001CF E5*23            [12]  601 	mov	a,_i
+      0001D1 9F               [12]  602 	subb	a,r7
+      0001D2 50 D4            [24]  603 	jnc	00107$
+                                    604 ;	scdn.c:180: if(a[current][i] != -1 &&
+      0001D4 E5*21            [12]  605 	mov	a,_current
+      0001D6 75 F0 04         [24]  606 	mov	b,#0x04
+      0001D9 A4               [48]  607 	mul	ab
+      0001DA FD               [12]  608 	mov	r5,a
+      0001DB AE F0            [24]  609 	mov	r6,b
+      0001DD E5*00            [12]  610 	mov	a,_bp
+      0001DF 24 FA            [12]  611 	add	a,#0xfa
+      0001E1 F8               [12]  612 	mov	r0,a
+      0001E2 ED               [12]  613 	mov	a,r5
+      0001E3 26               [12]  614 	add	a,@r0
+      0001E4 FA               [12]  615 	mov	r2,a
+      0001E5 EE               [12]  616 	mov	a,r6
+      0001E6 08               [12]  617 	inc	r0
+      0001E7 36               [12]  618 	addc	a,@r0
+      0001E8 FB               [12]  619 	mov	r3,a
+      0001E9 08               [12]  620 	inc	r0
+      0001EA 86 04            [24]  621 	mov	ar4,@r0
+      0001EC E5*23            [12]  622 	mov	a,_i
+      0001EE 2A               [12]  623 	add	a,r2
+      0001EF FA               [12]  624 	mov	r2,a
+      0001F0 E4               [12]  625 	clr	a
+      0001F1 3B               [12]  626 	addc	a,r3
+      0001F2 FB               [12]  627 	mov	r3,a
+      0001F3 8A 82            [24]  628 	mov	dpl,r2
+      0001F5 8B 83            [24]  629 	mov	dph,r3
+      0001F7 8C F0            [24]  630 	mov	b,r4
+      0001F9 12r00r00         [24]  631 	lcall	__gptrget
+      0001FC FA               [12]  632 	mov	r2,a
+      0001FD BA FF 03         [24]  633 	cjne	r2,#0xFF,00139$
+      000200 02r03r98         [24]  634 	ljmp	00112$
+      000203                        635 00139$:
+                                    636 ;	scdn.c:181: a[current][current] + a[current][i] < a[i][i])
+      000203 C0 07            [24]  637 	push	ar7
+      000205 E5*00            [12]  638 	mov	a,_bp
+      000207 24 FA            [12]  639 	add	a,#0xfa
+      000209 F8               [12]  640 	mov	r0,a
+      00020A A9*00            [24]  641 	mov	r1,_bp
+      00020C 09               [12]  642 	inc	r1
+      00020D ED               [12]  643 	mov	a,r5
+      00020E 26               [12]  644 	add	a,@r0
+      00020F F7               [12]  645 	mov	@r1,a
+      000210 EE               [12]  646 	mov	a,r6
+      000211 08               [12]  647 	inc	r0
+      000212 36               [12]  648 	addc	a,@r0
+      000213 09               [12]  649 	inc	r1
+      000214 F7               [12]  650 	mov	@r1,a
+      000215 08               [12]  651 	inc	r0
+      000216 09               [12]  652 	inc	r1
+      000217 E6               [12]  653 	mov	a,@r0
+      000218 F7               [12]  654 	mov	@r1,a
+      000219 A8*00            [24]  655 	mov	r0,_bp
+      00021B 08               [12]  656 	inc	r0
+      00021C E5*21            [12]  657 	mov	a,_current
+      00021E 26               [12]  658 	add	a,@r0
+      00021F FB               [12]  659 	mov	r3,a
+      000220 E4               [12]  660 	clr	a
+      000221 08               [12]  661 	inc	r0
+      000222 36               [12]  662 	addc	a,@r0
+      000223 FC               [12]  663 	mov	r4,a
+      000224 08               [12]  664 	inc	r0
+      000225 86 07            [24]  665 	mov	ar7,@r0
+      000227 8B 82            [24]  666 	mov	dpl,r3
+      000229 8C 83            [24]  667 	mov	dph,r4
+      00022B 8F F0            [24]  668 	mov	b,r7
+      00022D 12r00r00         [24]  669 	lcall	__gptrget
+      000230 FB               [12]  670 	mov	r3,a
+      000231 E5*00            [12]  671 	mov	a,_bp
+      000233 24 04            [12]  672 	add	a,#0x04
+      000235 F8               [12]  673 	mov	r0,a
+      000236 A6 03            [24]  674 	mov	@r0,ar3
+      000238 EB               [12]  675 	mov	a,r3
+      000239 33               [12]  676 	rlc	a
+      00023A 95 E0            [12]  677 	subb	a,acc
+      00023C 08               [12]  678 	inc	r0
+      00023D F6               [12]  679 	mov	@r0,a
+      00023E A8*00            [24]  680 	mov	r0,_bp
+      000240 08               [12]  681 	inc	r0
+      000241 E5*23            [12]  682 	mov	a,_i
+      000243 26               [12]  683 	add	a,@r0
+      000244 FA               [12]  684 	mov	r2,a
+      000245 E4               [12]  685 	clr	a
+      000246 08               [12]  686 	inc	r0
+      000247 36               [12]  687 	addc	a,@r0
+      000248 FC               [12]  688 	mov	r4,a
+      000249 08               [12]  689 	inc	r0
+      00024A 86 07            [24]  690 	mov	ar7,@r0
+      00024C 8A 82            [24]  691 	mov	dpl,r2
+      00024E 8C 83            [24]  692 	mov	dph,r4
+      000250 8F F0            [24]  693 	mov	b,r7
+      000252 12r00r00         [24]  694 	lcall	__gptrget
+      000255 FA               [12]  695 	mov	r2,a
+      000256 33               [12]  696 	rlc	a
+      000257 95 E0            [12]  697 	subb	a,acc
+      000259 FF               [12]  698 	mov	r7,a
+      00025A E5*00            [12]  699 	mov	a,_bp
+      00025C 24 04            [12]  700 	add	a,#0x04
+      00025E F8               [12]  701 	mov	r0,a
+      00025F A9*00            [24]  702 	mov	r1,_bp
+      000261 09               [12]  703 	inc	r1
+      000262 EA               [12]  704 	mov	a,r2
+      000263 26               [12]  705 	add	a,@r0
+      000264 F7               [12]  706 	mov	@r1,a
+      000265 EF               [12]  707 	mov	a,r7
+      000266 08               [12]  708 	inc	r0
+      000267 36               [12]  709 	addc	a,@r0
+      000268 09               [12]  710 	inc	r1
+      000269 F7               [12]  711 	mov	@r1,a
+      00026A E5*00            [12]  712 	mov	a,_bp
+      00026C 24 04            [12]  713 	add	a,#0x04
+      00026E F8               [12]  714 	mov	r0,a
+      00026F E5*23            [12]  715 	mov	a,_i
+      000271 75 F0 04         [24]  716 	mov	b,#0x04
+      000274 A4               [48]  717 	mul	ab
+      000275 F6               [12]  718 	mov	@r0,a
+      000276 08               [12]  719 	inc	r0
+      000277 A6 F0            [24]  720 	mov	@r0,b
+      000279 E5*00            [12]  721 	mov	a,_bp
+      00027B 24 FA            [12]  722 	add	a,#0xfa
+      00027D F8               [12]  723 	mov	r0,a
+      00027E E5*00            [12]  724 	mov	a,_bp
+      000280 24 04            [12]  725 	add	a,#0x04
+      000282 F9               [12]  726 	mov	r1,a
+      000283 E7               [12]  727 	mov	a,@r1
+      000284 26               [12]  728 	add	a,@r0
+      000285 FB               [12]  729 	mov	r3,a
+      000286 09               [12]  730 	inc	r1
+      000287 E7               [12]  731 	mov	a,@r1
+      000288 08               [12]  732 	inc	r0
+      000289 36               [12]  733 	addc	a,@r0
+      00028A FC               [12]  734 	mov	r4,a
+      00028B 08               [12]  735 	inc	r0
+      00028C 86 07            [24]  736 	mov	ar7,@r0
+      00028E E5*23            [12]  737 	mov	a,_i
+      000290 2B               [12]  738 	add	a,r3
+      000291 FB               [12]  739 	mov	r3,a
+      000292 E4               [12]  740 	clr	a
+      000293 3C               [12]  741 	addc	a,r4
+      000294 FC               [12]  742 	mov	r4,a
+      000295 8B 82            [24]  743 	mov	dpl,r3
+      000297 8C 83            [24]  744 	mov	dph,r4
+      000299 8F F0            [24]  745 	mov	b,r7
+      00029B 12r00r00         [24]  746 	lcall	__gptrget
+      00029E FB               [12]  747 	mov	r3,a
+      00029F 33               [12]  748 	rlc	a
+      0002A0 95 E0            [12]  749 	subb	a,acc
+      0002A2 FF               [12]  750 	mov	r7,a
+      0002A3 A8*00            [24]  751 	mov	r0,_bp
+      0002A5 08               [12]  752 	inc	r0
+      0002A6 C3               [12]  753 	clr	c
+      0002A7 E6               [12]  754 	mov	a,@r0
+      0002A8 9B               [12]  755 	subb	a,r3
+      0002A9 08               [12]  756 	inc	r0
+      0002AA E6               [12]  757 	mov	a,@r0
+      0002AB 64 80            [12]  758 	xrl	a,#0x80
+      0002AD 8F F0            [24]  759 	mov	b,r7
+      0002AF 63 F0 80         [24]  760 	xrl	b,#0x80
+      0002B2 95 F0            [12]  761 	subb	a,b
+      0002B4 D0 07            [24]  762 	pop	ar7
+      0002B6 40 03            [24]  763 	jc	00140$
+      0002B8 02r03r98         [24]  764 	ljmp	00112$
+      0002BB                        765 00140$:
+                                    766 ;	scdn.c:183: a[i][i] = a[current][current] + a[current][i];
+      0002BB C0 07            [24]  767 	push	ar7
+      0002BD E5*00            [12]  768 	mov	a,_bp
+      0002BF 24 FA            [12]  769 	add	a,#0xfa
+      0002C1 F8               [12]  770 	mov	r0,a
+      0002C2 E5*00            [12]  771 	mov	a,_bp
+      0002C4 24 04            [12]  772 	add	a,#0x04
+      0002C6 F9               [12]  773 	mov	r1,a
+      0002C7 E7               [12]  774 	mov	a,@r1
+      0002C8 26               [12]  775 	add	a,@r0
+      0002C9 FA               [12]  776 	mov	r2,a
+      0002CA 09               [12]  777 	inc	r1
+      0002CB E7               [12]  778 	mov	a,@r1
+      0002CC 08               [12]  779 	inc	r0
+      0002CD 36               [12]  780 	addc	a,@r0
+      0002CE FB               [12]  781 	mov	r3,a
+      0002CF 08               [12]  782 	inc	r0
+      0002D0 86 04            [24]  783 	mov	ar4,@r0
+      0002D2 A8*00            [24]  784 	mov	r0,_bp
+      0002D4 08               [12]  785 	inc	r0
+      0002D5 E5*23            [12]  786 	mov	a,_i
+      0002D7 2A               [12]  787 	add	a,r2
+      0002D8 F6               [12]  788 	mov	@r0,a
+      0002D9 E4               [12]  789 	clr	a
+      0002DA 3B               [12]  790 	addc	a,r3
+      0002DB 08               [12]  791 	inc	r0
+      0002DC F6               [12]  792 	mov	@r0,a
+      0002DD 08               [12]  793 	inc	r0
+      0002DE A6 04            [24]  794 	mov	@r0,ar4
+      0002E0 E5*00            [12]  795 	mov	a,_bp
+      0002E2 24 FA            [12]  796 	add	a,#0xfa
+      0002E4 F8               [12]  797 	mov	r0,a
+      0002E5 ED               [12]  798 	mov	a,r5
+      0002E6 26               [12]  799 	add	a,@r0
+      0002E7 FD               [12]  800 	mov	r5,a
+      0002E8 EE               [12]  801 	mov	a,r6
+      0002E9 08               [12]  802 	inc	r0
+      0002EA 36               [12]  803 	addc	a,@r0
+      0002EB FE               [12]  804 	mov	r6,a
+      0002EC 08               [12]  805 	inc	r0
+      0002ED 86 07            [24]  806 	mov	ar7,@r0
+      0002EF E5*21            [12]  807 	mov	a,_current
+      0002F1 2D               [12]  808 	add	a,r5
+      0002F2 FA               [12]  809 	mov	r2,a
+      0002F3 E4               [12]  810 	clr	a
+      0002F4 3E               [12]  811 	addc	a,r6
+      0002F5 FB               [12]  812 	mov	r3,a
+      0002F6 8F 04            [24]  813 	mov	ar4,r7
+      0002F8 E5*23            [12]  814 	mov	a,_i
+      0002FA 2D               [12]  815 	add	a,r5
+      0002FB FD               [12]  816 	mov	r5,a
+      0002FC E4               [12]  817 	clr	a
+      0002FD 3E               [12]  818 	addc	a,r6
+      0002FE FE               [12]  819 	mov	r6,a
+      0002FF 8D 82            [24]  820 	mov	dpl,r5
+      000301 8E 83            [24]  821 	mov	dph,r6
+      000303 8F F0            [24]  822 	mov	b,r7
+      000305 12r00r00         [24]  823 	lcall	__gptrget
+      000308 FD               [12]  824 	mov	r5,a
+      000309 8A 82            [24]  825 	mov	dpl,r2
+      00030B 8B 83            [24]  826 	mov	dph,r3
+      00030D 8C F0            [24]  827 	mov	b,r4
+      00030F 12r00r00         [24]  828 	lcall	__gptrget
+      000312 2D               [12]  829 	add	a,r5
+      000313 FD               [12]  830 	mov	r5,a
+      000314 A8*00            [24]  831 	mov	r0,_bp
+      000316 08               [12]  832 	inc	r0
+      000317 86 82            [24]  833 	mov	dpl,@r0
+      000319 08               [12]  834 	inc	r0
+      00031A 86 83            [24]  835 	mov	dph,@r0
+      00031C 08               [12]  836 	inc	r0
+      00031D 86 F0            [24]  837 	mov	b,@r0
+      00031F ED               [12]  838 	mov	a,r5
+      000320 12r00r00         [24]  839 	lcall	__gptrput
+                                    840 ;	scdn.c:184: priority = a[i][i] + heuristic(goal, i, a[i][i]);
+      000323 E5*23            [12]  841 	mov	a,_i
+      000325 75 F0 04         [24]  842 	mov	b,#0x04
+      000328 A4               [48]  843 	mul	ab
+      000329 FE               [12]  844 	mov	r6,a
+      00032A AF F0            [24]  845 	mov	r7,b
+      00032C E5*00            [12]  846 	mov	a,_bp
+      00032E 24 FA            [12]  847 	add	a,#0xfa
+      000330 F8               [12]  848 	mov	r0,a
+      000331 EE               [12]  849 	mov	a,r6
+      000332 26               [12]  850 	add	a,@r0
+      000333 FE               [12]  851 	mov	r6,a
+      000334 EF               [12]  852 	mov	a,r7
+      000335 08               [12]  853 	inc	r0
+      000336 36               [12]  854 	addc	a,@r0
+      000337 FF               [12]  855 	mov	r7,a
+      000338 08               [12]  856 	inc	r0
+      000339 86 05            [24]  857 	mov	ar5,@r0
+      00033B E5*23            [12]  858 	mov	a,_i
+      00033D 2E               [12]  859 	add	a,r6
+      00033E FA               [12]  860 	mov	r2,a
+      00033F E4               [12]  861 	clr	a
+      000340 3F               [12]  862 	addc	a,r7
+      000341 FB               [12]  863 	mov	r3,a
+      000342 8D 04            [24]  864 	mov	ar4,r5
+      000344 E5*23            [12]  865 	mov	a,_i
+      000346 2E               [12]  866 	add	a,r6
+      000347 FE               [12]  867 	mov	r6,a
+      000348 E4               [12]  868 	clr	a
+      000349 3F               [12]  869 	addc	a,r7
+      00034A FF               [12]  870 	mov	r7,a
+      00034B 8E 82            [24]  871 	mov	dpl,r6
+      00034D 8F 83            [24]  872 	mov	dph,r7
+      00034F 8D F0            [24]  873 	mov	b,r5
+      000351 12r00r00         [24]  874 	lcall	__gptrget
+      000354 FE               [12]  875 	mov	r6,a
+      000355 C0 04            [24]  876 	push	ar4
+      000357 C0 03            [24]  877 	push	ar3
+      000359 C0 02            [24]  878 	push	ar2
+      00035B C0 06            [24]  879 	push	ar6
+      00035D C0*23            [24]  880 	push	_i
+      00035F E5*00            [12]  881 	mov	a,_bp
+      000361 24 FD            [12]  882 	add	a,#0xfd
+      000363 F8               [12]  883 	mov	r0,a
+      000364 86 82            [24]  884 	mov	dpl,@r0
+      000366 12r01r3F         [24]  885 	lcall	_heuristic
+      000369 AF 82            [24]  886 	mov	r7,dpl
+      00036B 15 81            [12]  887 	dec	sp
+      00036D 15 81            [12]  888 	dec	sp
+      00036F D0 02            [24]  889 	pop	ar2
+      000371 D0 03            [24]  890 	pop	ar3
+      000373 D0 04            [24]  891 	pop	ar4
+      000375 8A 82            [24]  892 	mov	dpl,r2
+      000377 8B 83            [24]  893 	mov	dph,r3
+      000379 8C F0            [24]  894 	mov	b,r4
+      00037B 12r00r00         [24]  895 	lcall	__gptrget
+      00037E 2F               [12]  896 	add	a,r7
+      00037F F5*22            [12]  897 	mov	_priority,a
+                                    898 ;	scdn.c:185: insert(i, priority);
+      000381 C0 07            [24]  899 	push	ar7
+      000383 C0*22            [24]  900 	push	_priority
+      000385 85*23 82         [24]  901 	mov	dpl,_i
+      000388 12r00rBB         [24]  902 	lcall	_insert
+      00038B 15 81            [12]  903 	dec	sp
+      00038D D0 07            [24]  904 	pop	ar7
+                                    905 ;	scdn.c:187: came_from[i] = current;
+      00038F E5*23            [12]  906 	mov	a,_i
+      000391 24r1D            [12]  907 	add	a,#_came_from
+      000393 F8               [12]  908 	mov	r0,a
+      000394 A6*21            [24]  909 	mov	@r0,_current
+                                    910 ;	scdn.c:178: i++)
+      000396 D0 07            [24]  911 	pop	ar7
+                                    912 ;	scdn.c:187: came_from[i] = current;
+      000398                        913 00112$:
+                                    914 ;	scdn.c:178: i++)
+      000398 05*23            [12]  915 	inc	_i
+      00039A 02r01rCE         [24]  916 	ljmp	00111$
+      00039D                        917 00113$:
+      00039D 85*00 81         [24]  918 	mov	sp,_bp
+      0003A0 D0*00            [24]  919 	pop	_bp
+      0003A2 22               [24]  920 	ret
+                                    921 ;------------------------------------------------------------
+                                    922 ;Allocation info for local variables in function 'main'
+                                    923 ;------------------------------------------------------------
+                                    924 ;	scdn.c:194: void main()
+                                    925 ;	-----------------------------------------
+                                    926 ;	 function main
+                                    927 ;	-----------------------------------------
+      0003A3                        928 _main:
+                                    929 ;	scdn.c:196: make_oriented();
+      0003A3 12r00r12         [24]  930 	lcall	_make_oriented
+                                    931 ;	scdn.c:197: astar(size, goal, a);
+      0003A6 74r08            [12]  932 	mov	a,#_a
+      0003A8 C0 E0            [24]  933 	push	acc
+      0003AA 74s00            [12]  934 	mov	a,#(_a >> 8)
+      0003AC C0 E0            [24]  935 	push	acc
+      0003AE 74 40            [12]  936 	mov	a,#0x40
+      0003B0 C0 E0            [24]  937 	push	acc
+      0003B2 74 45            [12]  938 	mov	a,#0x45
+      0003B4 C0 E0            [24]  939 	push	acc
+      0003B6 75 82 04         [24]  940 	mov	dpl,#0x04
+      0003B9 12r01r8A         [24]  941 	lcall	_astar
+      0003BC E5 81            [12]  942 	mov	a,sp
+      0003BE 24 FC            [12]  943 	add	a,#0xfc
+      0003C0 F5 81            [12]  944 	mov	sp,a
+                                    945 ;	scdn.c:198: resetValues();
+      0003C2 02r00r00         [24]  946 	ljmp	_resetValues
+                                    947 	.area CSEG    (CODE)
+                                    948 	.area CONST   (CODE)
+                                    949 	.area XINIT   (CODE)
+                                    950 	.area CABS    (ABS,CODE)

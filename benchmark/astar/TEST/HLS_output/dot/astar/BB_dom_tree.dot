@@ -1,0 +1,15 @@
+digraph G {
+0[color=blue,shape=Msquare, label="ENTRY"];
+1[color=blue,shape=Msquare, label="EXIT"];
+2[shape=box, label="BB2 - GCCLI: 0 - HPL: 0 - Cer: 0 - Loop 0 - Executions: 0\n29404 -> _8282 = (&(i));\l29267 -> if(1u) (*((TARGET_INDEX*)(_8282))) = 2u;\l29517 -> _8310 = a2;\l29473 -> _8299 = (char(*)[2]) (_8310);\l29411 -> _8283 = (char*) (_8299);\l29268 -> if(1u) (*((char*)(_8283))) = 0;\l29501 -> _8307 = (char(*)[2])(((unsigned char*)_8299) + 2);\l29426 -> _8287 = (char*) (_8307);\l29435 -> _8290 = _8287 + 1;\l29269 -> if(1u) (*((char*)(_8290))) = 127;\l29511 -> _8309 = frontier;\l29441 -> _8291 = (TARGET_TYPE*) (_8309);\l29270 -> if(1u) (*((TARGET_TYPE*)(_8291))) = 0u;\l29455 -> _8295 = (&(frontier_size));\l29271 -> if(1u) _8244 = (*((TARGET_TYPE*)(_8295)));\l29272 -> _8245 = (unsigned char)(_8244 + (1u));\l29273 -> if(1u) (*((TARGET_TYPE*)(_8295))) = _8245;\l29463 -> _8297 = (&(current));\l29274 -> if(1u) current_lsm_77_8246 = (*((TARGET_INDEX*)(_8297)));\l29275 -> if(1u) i_lsm_76_8247 = (*((TARGET_INDEX*)(_8282)));\l29549 -> _8319 = _8291 + 1;\l"];
+3[shape=box, label="BB3 - GCCLI: 1 - HPL: 0 - Cer: 0 - Loop 0 - Executions: 0\n29297 -> if(1u) min_8250 = (*((TARGET_TYPE*)(_8291)));\l29298 -> _8251 = (char) (min_8250);\l29299 -> _8252 = _8251 > (0);\l29300 -> min_8253 = _8252 ? min_8250 : 127u;\l29301 -> current_lsm_77_8254 = _8252 ? 0u : current_lsm_77_8275;\l29302 -> if(1u) min_8255 = (*((TARGET_TYPE*)(_8319)));\l29303 -> _8256 = min_8255 != (0u);\l29304 -> _8257 = min_8253 >= min_8255;\l29305 -> _8258 = _8257 & _8256;\l29306 -> current_lsm_77_8259 = _8258 ? 1u : current_lsm_77_8254;\l29308 -> _8261 = (int) (current_lsm_77_8259);\l29556 -> _8321 = (unsigned long) (_8261);\l29562 -> _8323 = _8291 + _8321;\l29309 -> if(1u) (*((TARGET_TYPE*)(_8323))) = 0u;\l29706 -> _8362 = goal == current_lsm_77_8259;\l29310 -> if (_8362)\l"];
+4[shape=box, label="BB4 - GCCLI: 0 - HPL: 0 - Cer: 0 - Loop 0 - Executions: 0\n29354 -> if(1u) (*((TARGET_INDEX*)(_8282))) = 2u;\l29355 -> if(1u) (*((TARGET_INDEX*)(_8297))) = current_lsm_77_8259;\l29358 -> if(1u) (*((TARGET_TYPE*)(_8295))) = _8260;\l29830 -> return ;\l"];
+5[shape=box, label="BB7 - GCCLI: 1 - HPL: 0 - Cer: 0 - Loop 0 - Executions: 0\l29342 -> /* _8273 = gimple_phi(<_8245, BB2>, <_8260, BB3>) */\l29366 -> /* i_lsm_76_8274 = gimple_phi(<i_lsm_76_8247, BB2>, <size, BB3>) */\l29327 -> /* current_lsm_77_8275 = gimple_phi(<current_lsm_77_8246, BB2>, <current_lsm_77_8259, BB3>) */\l29848 -> /* _MEM_8401 = gimple_phi(<_MEM_8400, BB2>, <_MEM_8249, BB3>) */\l29708 -> _8363 = _8273 != (0u);\l29307 -> _8260 = (unsigned char)(_8273 + (255u));\l29381 -> if (_8363)\l"];
+6[shape=box, label="BB8 - GCCLI: 0 - HPL: 0 - Cer: 0 - Loop 0 - Executions: 0\n29349 -> if(1u) (*((TARGET_INDEX*)(_8282))) = i_lsm_76_8274;\l29371 -> if(1u) (*((TARGET_INDEX*)(_8297))) = current_lsm_77_8275;\l29374 -> if(1u) (*((TARGET_TYPE*)(_8295))) = 0u;\l29831 -> return ;\l"];
+0->1 [fontcolor=blue];
+0->2 [fontcolor=blue];
+2->5 [fontcolor=blue];
+3->4 [fontcolor=blue];
+5->3 [fontcolor=blue];
+5->6 [fontcolor=blue];
+}

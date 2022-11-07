@@ -55,9 +55,9 @@ class CommandsManager:
             flags.remove('{' + outputFile + '}')
 
             with open(outputFile, 'w') as obj:
-                call(flags, stdout = obj) #stderr = DEVNULL)
+                call(flags, stdout = obj) #, stderr = DEVNULL)
         else:
-            call(flags) #stderr = DEVNULL, stdout = DEVNULL)
+            call(flags) #, stderr = DEVNULL, stdout = DEVNULL)
 
     def executeCommandSet(
             self, cmdSet, inputsPath, parsingFunction = None

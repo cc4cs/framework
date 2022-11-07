@@ -1,0 +1,13 @@
+digraph G {
+0[color=blue,shape=Msquare,label="ENTRY - ENTRY"];
+1[color=blue,shape=Msquare,label="EXIT - EXIT"];
+2[color=green,shape=box,label="main_28878_29386 - make_oriented\nmake_oriented();\n"];
+3[color=burlywood,shape=box,label="main_28878_29602 - addr_expr\n_8333 = a2;\n"];
+4[color=burlywood,shape=box,label="main_28878_29720 - nop_expr\n_8368 = (TARGET_TYPE(*)[]) (_8333);\n"];
+5[color=green,shape=box,label="main_28878_29387 - astar\nastar(2u, _8368, 5u);\n"];
+6[label="main_28878_29388 - gimple_return\nreturn ;\n"];
+5->6 [color=red3,label=""];
+2->6 [color=red3,label=""];
+3->6 [color=red3,label=""];
+4->6 [color=red3,label=""];
+}
