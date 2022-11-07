@@ -19,7 +19,7 @@ projectPath = dirname(configsrc) + '/'
 # Global Variables
 filess = {
     '8051': 'scnd.c', 'Leon3':'frst.c', 'Thumb':'thrd.c',
-    'Atmega328p':'frst.c', 'Arm':'thrd.c'
+    'Atmega328p':'frst.c', 'Arm':'thrd.c','ALL':'thrd.c'
 }
 targets = ["int8_t"] # TARGET_INDEX types
 indexes = ["int8_t"] # TARGET_TYPE types
@@ -107,69 +107,182 @@ gui.fillMainWindow(projectPath + '/benchmark', gui.callback)
 gui.start()
 
 cmds = loadCommands()
+
+# directory containing the source file of the functions
 source = projectPath + 'benchmark/' + gui.function + '/'
 funSrc = source + filess[gui.micro]
+
 inputsGen = InputsGenerator(funSrc, gui.function, gui.micro)
+cmdMan = CommandsManager(funSrc, configsrc, gui.results)
 
+if(gui.micro=="ALL"):
 
-
-
-for target, index in zip(targets, indexes):
+    for target, index in zip(targets, indexes):
     
-    print("#### type: ", target)
-    inputsPath = gui.results + "/includes"
-    print("input generation...", end = " ")
-    # Generates the header files, i.e. the inputs of the function
-    inputsGen.generate(inputsPath, target, index)
-    print("Done!")
-    # Executes commands needed to include configuration files of
-    # the microprocessors
-    configcmd = cmds['Configuration'].get(gui.micro)
-    if configcmd:
-        cmdMan.executeCommand(
-            cmdMan.expandCommand(configcmd, configsrc, gui.results)
-        )
-    """
-    Profiling: Gets the number of executed C statements:
-        1. retrieves the commands for profiling the function from cmds.json
-        2. for each couple (input, function) is executed on the host
-        3. the number of executed c statements is collected for each execution
-    """
+        print("#### type: ", target)
+        inputsPath = gui.results + "/includes"
+        print("input generation...", end = " ")
+        # Generates the header files, i.e. the inputs of the function
+        inputsGen.generate(inputsPath, target, index)
+        print("Done!")
+        # Executes commands needed to include configuration files of
+        # the microprocessors
+        configcmd = cmds['Configuration'].get(gui.micro)
+        if configcmd:
+            cmdMan.executeCommand(cmdMan.expandCommand(configcmd, configsrc, gui.results))
+        """
+        Profiling: Gets the number of executed C statements:
+            1. retrieves the commands for profiling the function from cmds.json
+            2. for each couple (input, function) is executed on the host
+            3. the number of executed c statements is collected for each execution
+        """
     
-    """
-    Simulation
-    """
+        """
+        Simulation
+        """
     
-    for iss in gui.getmicros():
-        
-        print(
+        for iss in gui.getmicros():
+            
+            print(
         "retrieving executed C statements on the host platform...", end = " "
     )
 
-        parser = Parser(gui.results + "/cStatements.csv", Parser.gcovParser, ['id', 'cInstr']
-    ) # creates the output file and binds the parser
-        # directory containing the source file of the functions
-        source = projectPath + 'benchmark/' + gui.function + '/'
-        funSrc = source + filess[iss]
+            parser = Parser(gui.results + "/cStatements.csv", Parser.gcovParser, ['id', 'cInstr']
+    )       # creates the output file and binds the parser
+            # directory containing the source file of the functions
+            source = projectPath + 'benchmark/' + gui.function + '/'
+            funSrc = source + filess[iss]
 
-        cmdMan = CommandsManager(funSrc, configsrc, gui.results)
+            cmdMan = CommandsManager(funSrc, configsrc, gui.results)
+
+            cmdMan.executeCommandSet(
+            cmds['Profiling'], inputsPath, parsingFunction = parser.run
+    )
+            print("Done!")
+        # Creates the directory in which store the results  
+            if not isdir(iss+"/"+gui.function):
+                makedirs(iss+"/"+gui.function)
+            print("simulation on the target platform...", end = " ")
+            parser = Parser(
+            gui.results + "/clockCycles.csv", Parser.PARSERS.get(iss),
+            ['id', 'clockCycles', 'assemblyInstr']
+    )
+            cmdMan.executeCommandSet(
+            cmds[iss], inputsPath, parsingFunction = parser.run
+    )
+            print("Done!")
+            print("calculating cc4s...", end = " ")
+    # Generates CC4CS file
+            calculateMetric(
+            gui.results + "/cStatements.csv", gui.results + "/clockCycles.csv",
+            "cc4csValues.csv"
+    )
+            print("Done!")
+            files = getFiles('.', '.csv') + getFiles('.', '.txt')
+            for file in files:
+                move(file, join(iss+"/"+gui.function, file))
+
+    # Creates a compact representation of the inputs
+            parser.inputParser(
+            gui.results + "/inputResume.csv", gui.results + "/includes"
+    )
+
+        print("collecting execution statistics using frama-c...", end = " ")
+    # Retrieves code metrics using FramaC
+        cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
+
+    # Builds a parser to collect Halsted statistics  
+        parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
+        parser.framaParser(gui.results + "/files", 1)
+
+    # Builds a parser to collect Halsted statistics  
+        parser.outputPath = gui.results + "/McCabe.csv"
+        parser.framaParser(gui.results + "/files", 0)
+        print("Done!")
+
+    
+
+    
+        for iss in gui.getmicros():
+            files = getFiles('.', '.csv') + getFiles('.', '.txt')
+            for file in files:
+                shutil.copyfile(file, join(iss+"/"+gui.function, file))
+
+    # Deletes the directory containing the inputs for the current type 
+        rmtree("includes/")
+        rmtree("files/")
+
+    print("\n#### Ended! Results stored in ", gui.results)
+else:
+    cmds = loadCommands()
+# directory containing the source file of the functions
+    source = projectPath + 'benchmark/' + gui.function + '/'
+    funSrc = source + filess[gui.micro]
+
+    inputsGen = InputsGenerator(funSrc, gui.function, gui.micro)
+    cmdMan = CommandsManager(funSrc, configsrc, gui.results)
+
+    for target, index in zip(targets, indexes):
+        print("#### type: ", target)
+        inputsPath = gui.results + "/includes"
+        print("input generation...", end = " ")
+    # Generates the header files, i.e. the inputs of the function
+        inputsGen.generate(inputsPath, target, index)
+        print("Done!")
+    # Executes commands needed to include configuration files of
+    # the microprocessors
+        configcmd = cmds['Configuration'].get(gui.micro)
+        if configcmd:
+            cmdMan.executeCommand(
+                cmdMan.expandCommand(configcmd, configsrc, gui.results)
+        )
+        """
+        Profiling: Gets the number of executed C statements:
+        1. retrieves the commands for profiling the function from cmds.json
+        2. for each couple (input, function) is executed on the host
+        3. the number of executed c statements is collected for each execution
+        """
+        print(
+        "retrieving executed C statements on the host platform...", end = " "
+    )
+        parser = Parser(
+        gui.results + "/cStatements.csv", Parser.gcovParser, ['id', 'cInstr']
+    ) # creates the output file and binds the parser
 
         cmdMan.executeCommandSet(
-        cmds['Profiling'], inputsPath, parsingFunction = parser.run
+            cmds['Profiling'], inputsPath, parsingFunction = parser.run
     )
         print("Done!")
-        # Creates the directory in which store the results  
-        if not isdir(iss+"/"+gui.function):
-            makedirs(iss+"/"+gui.function)
+        """
+        Simulation
+        """
         print("simulation on the target platform...", end = " ")
         parser = Parser(
-        gui.results + "/clockCycles.csv", Parser.PARSERS.get(iss),
+        gui.results + "/clockCycles.csv", Parser.PARSERS.get(gui.micro),
         ['id', 'clockCycles', 'assemblyInstr']
     )
         cmdMan.executeCommandSet(
-        cmds[iss], inputsPath, parsingFunction = parser.run
+        cmds[gui.micro], inputsPath, parsingFunction = parser.run
     )
         print("Done!")
+    # Creates a compact representation of the inputs
+        parser.inputParser(
+        gui.results + "/inputResume.csv", gui.results + "/includes"
+    )
+
+        print("collecting execution statistics using frama-c...", end = " ")
+    # Retrieves code metrics using FramaC
+        cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
+
+    # Builds a parser to collect Halsted statistics
+        parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
+        parser.framaParser(gui.results + "/files", 1)
+
+    # Builds a parser to collect Halsted statistics
+        parser.outputPath = gui.results + "/McCabe.csv"
+        parser.framaParser(gui.results + "/files", 0)
+        print("Done!")
+
         print("calculating cc4s...", end = " ")
     # Generates CC4CS file
         calculateMetric(
@@ -177,38 +290,13 @@ for target, index in zip(targets, indexes):
         "cc4csValues.csv"
     )
         print("Done!")
+
+    # Creates the directory in which store the results 
+        if not isdir(target):
+            makedirs(target)
+
         files = getFiles('.', '.csv') + getFiles('.', '.txt')
         for file in files:
-            move(file, join(iss+"/"+gui.function, file))
+            move(file, join(target, file))
 
-    # Creates a compact representation of the inputs
-    parser.inputParser(
-        gui.results + "/inputResume.csv", gui.results + "/includes"
-    )
-
-    print("collecting execution statistics using frama-c...", end = " ")
-    # Retrieves code metrics using FramaC
-    cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
-
-    # Builds a parser to collect Halsted statistics  
-    parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
-    parser.framaParser(gui.results + "/files", 1)
-
-    # Builds a parser to collect Halsted statistics  
-    parser.outputPath = gui.results + "/McCabe.csv"
-    parser.framaParser(gui.results + "/files", 0)
-    print("Done!")
-
-    
-
-    
-    for iss in gui.getmicros():
-        files = getFiles('.', '.csv') + getFiles('.', '.txt')
-        for file in files:
-            shutil.copyfile(file, join(iss+"/"+gui.function, file))
-
-    # Deletes the directory containing the inputs for the current type 
-    #rmtree("includes/")
-    #rmtree("files/")
-
-print("\n#### Ended! Results stored in ", gui.results)
+        print("\n#### Ended! Results stored in ", gui.results)

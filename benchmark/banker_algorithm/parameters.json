@@ -1,5 +1,15 @@
 {
 	"args": ["TARGET_INDEX n_process", "TARGET_INDEX n_resources", "TARGET_TYPE available[n_resources]", "TARGET_TYPE allocated[n_process][n_resources]", "TARGET_TYPE max[n_process][n_resources]"],
+	"ALL":
+	{
+		"int8_t":{
+			"n_process": "[2,28];32",
+			"n_resources": "[2,28];32",
+			"available[n_resources]": "[0,255]",
+			"allocated[n_process][n_resources]": "[0,255]",
+			"max[n_process][n_resources]": "[0,255]"
+		}
+	},
 	"Arm":
 	{
 		"int8_t":{

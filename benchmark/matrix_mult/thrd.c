@@ -9,7 +9,7 @@ typedef int8_t TARGET_INDEX;
 TARGET_TYPE res[rows_a][columns_b];
 #endif
 
-void matrix_mul()
+void matrix_mult()
 {
 	TARGET_INDEX i, j, k, tot = 0; 
 
@@ -43,5 +43,5 @@ void matrix_mul()
 
 void main()
 {
-	matrix_mul();
+	matrix_mult();
 }
