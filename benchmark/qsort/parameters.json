@@ -1,4 +1,12 @@
 {	"args": ["TARGET_INDEX n", "TARGET_TYPE arr[n]"],
+"ALL":
+	{
+		"int8_t":
+		{
+			"n" : "[2,28];1000",
+			"arr[n]" : "[-127,127]"
+		}
+		},
 	"Arm":
 	{
 		"int8_t":

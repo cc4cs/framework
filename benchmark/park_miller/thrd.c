@@ -12,7 +12,17 @@ typedef int8_t TARGET_INDEX;
 #define MASK 123459876
 
 
+TARGET_TYPE my_fmod(TARGET_TYPE a, int b)
 
+{	TARGET_TYPE quot;
+	while(a>0)
+	{
+		quot++;
+		a=a-b;
+	}
+    /*TARGET_TYPE quot = (TARGET_TYPE) a/b;*/
+    return quot;
+}
 TARGET_TYPE mult(TARGET_TYPE a, TARGET_TYPE b)
 
 {	TARGET_TYPE x;
@@ -37,7 +47,7 @@ a sequence.
 
 	idum ^= MASK;
 	
-	k=idum/IQ;
+	k=my_fmod(idum,IQ);
 	idum = mult(IA , ( idum - k * IQ) - mult(IR , k));
 	if(idum < 0)
 		idum += IM;

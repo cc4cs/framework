@@ -126,14 +126,14 @@ class Parser:
 
         return content
 
-    def getInputsRow(self, outputPath, args, values = []):
+    def getInputsRow(self, outputPath, args, values ):
         filePath, idxStart, idxEnd = args
 
         with open(filePath, 'r') as fp:
             lines = fp.readlines()[idxStart:idxEnd]
             # Removes the last element from the array that is a useless line
             lines = lines[:-1]
-            content = []
+            content = [values]
 
             for ln in lines:
                 value = ln.split('=')[1]
@@ -194,7 +194,7 @@ class Parser:
         for dirName in dirs:
             filesPath = inputsPath + '/' + dirName + '/values.h'
             params = [filesPath, 2, None]
-            self.getInputsRow(outputPath, params, values = [dirName])
+            self.getInputsRow(outputPath, params, values = dirName)
 
     PARSERS = {
         'Thumb': thumbParser,

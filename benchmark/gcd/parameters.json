@@ -1,4 +1,11 @@
 {	"args":["TARGET_TYPE m", "TARGET_TYPE n"],
+"ALL":
+	{
+		"int8_t":{
+			"m": "[2,127];32",
+			"n": "[2,127];32"
+			}
+		},
 	"Arm":
 	{
 		"int8_t":{

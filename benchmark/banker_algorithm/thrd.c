@@ -6,7 +6,7 @@ typedef int8_t TARGET_INDEX;
 
 #ifndef NEED
 #define NEED
-TARGET_TYPE need[n_process][n_resources];
+TARGET_TYPE need[size][size];
 #endif
 
 TARGET_INDEX i = 0;
@@ -19,15 +19,15 @@ TARGET_TYPE found = 0;
 
 TARGET_TYPE banker_algorithm()
 {	
-	for(i = 0; i < n_process; i++)
+	for(i = 0; i < size; i++)
 	{
-		for(j = 0; j < n_resources; j++)
+		for(j = 0; j < size; j++)
 			need[i][j] = max[i][j] - allocated[i][j];
 	}
-	for(i = 0; i < n_process; i++)
+	for(i = 0; i < size; i++)
 	{
 		
-		for(j = 0; j < n_resources; j++)
+		for(j = 0; j < size; j++)
 		{
 
 			available[j] -= need[i][j];
@@ -55,5 +55,5 @@ TARGET_TYPE banker_algorithm()
 void main()
 {
 
-	banker_algorithm(n_process, n_resources, available, allocated,max);
+	banker_algorithm();
 }

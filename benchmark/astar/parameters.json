@@ -1,11 +1,19 @@
 {	
 	"args":["TARGET_INDEX size", "TARGET_INDEX goal", "TARGET_TYPE a[size][size]"],
+	"ALL":
+	{
+		"int8_t":{
+			"size": "[2,3];4",
+			"a[size][size]": "[-128,127]",
+			"goal": "[2,3];4"
+			}
+		},
 	"Arm":
 	{
 		"int8_t":{
-			"size": "[2,5];1000",
+			"size": "[2,5];10",
 			"a[size][size]": "[-128,127]",
-			"goal": "[2,5];1000"
+			"goal": "[2,5];10"
 		},
 
 	
