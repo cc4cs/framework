@@ -29,11 +29,11 @@ class Parser:
 
             wrt.writerow(row)
 
+
     def run(self, parserInput, values = []):
         # Executes the parsing function 
         results = self.parsingFunction(parserInput)
         values.extend(results)
-
         # Writes the values
         self.writeFile({key:value for key, value in zip(self.headers, values)})
 
@@ -114,6 +114,7 @@ class Parser:
 
         return headers
 
+   
     def getFramaRow(args):
         filePath, idxStart, idxEnd = args
         content = []
@@ -121,14 +122,16 @@ class Parser:
         with open(filePath, 'r') as fp:
             lines = fp.readlines()[idxStart:idxEnd]
             for ln in lines:
-                value = search(r'\d+\.?\d+', ln)
-                if value: content.append(value.group())
+                if(ln.find(':')!=-1):
+                    value=ln.split(':')[1]
+                elif(ln.find('=')!=-1):
+                    value=ln.split('=')[1]
+                if value: content.append(value)
 
         return content
 
     def getInputsRow(self, outputPath, args, values ):
         filePath, idxStart, idxEnd = args
-
         with open(filePath, 'r') as fp:
             lines = fp.readlines()[idxStart:idxEnd]
             # Removes the last element from the array that is a useless line
@@ -153,31 +156,48 @@ class Parser:
             outputPath
         )
 
+    def sizeParser(self, inputsPath):
+        dirs = [f for f in listdir(inputsPath) if isdir(join(inputsPath, f))]
+        # Gets the headers from the output file
+        self.headers = ['inputName','text','data','bss']
+        fileName = "size.txt"
+        for dirName in dirs:
+            filesPath = inputsPath + '/' + dirName + '/' + fileName
+            with open(filesPath, 'r') as fp:
+                lines = fp.readlines()
+                params = [int(temp)for temp in lines[1].split() if temp.isdigit()] 
+                values=[dirName]
+                values.extend(params)
+                self.writeFile({key:value for key, value in zip(self.headers, values)})
+
+
     def framaParser(self, inputsPath, analysisFlag):
         dirs = [f for f in listdir(inputsPath) if isdir(join(inputsPath, f))]
         # Gets the headers from the output file
         self.headers = ["inputName"]
-        idxStart = 4
 
         # Halsted output parsing
         if analysisFlag:
+            idxStart = 5
             fileName = "Halsted.txt"
-            idxEnd = 15
+            idxEnd = 17
             # Parameters for the Halsted file
             filesPath = inputsPath + "/values_0/" + fileName
             params = [filesPath, idxStart, idxEnd, r'([a-zA-Z_]+\s?)*:']
         else:
             # McCabe output parameters 
+            idxStart = 23
+            idxEnd= 37
             fileName = "McCabe.txt"
-            idxEnd = None
             filesPath = inputsPath + "/values_0/" + fileName
             params = [filesPath, idxStart, idxEnd, r'([a-zA-Z_]+\s)+=']   # (\w+\s)+=
 
         self.headers.extend(self.getHeaders(params, pascalCase = True))
-
+        
         for dirName in dirs:
             filesPath = inputsPath + '/' + dirName + '/' + fileName
             params = [filesPath, idxStart, idxEnd]
+            
             self.run(params, values = [dirName])
 
     def inputParser(self, outputPath, inputsPath):

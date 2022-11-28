@@ -7,7 +7,7 @@ typedef int16_t TARGET_INDEX;
 TARGET_TYPE dist[size];
 TARGET_INDEX i, j = 0;
 
-void bellmanford(TARGET_INDEX size, TARGET_TYPE a[size][size])
+void bellmanford()
 {
 	TARGET_INDEX up = 0;
 
@@ -68,5 +68,5 @@ void main()
 {
 
 	make_oriented();
-	bellmanford(size, a);
+	bellmanford();
 }

@@ -1,15 +1,15 @@
 #include <stdint.h>
 #include <values.h>
 
-typedef float TARGET_TYPE;
-typedef long TARGET_INDEX;
+typedef int8_t TARGET_TYPE;
+typedef int8_t TARGET_INDEX;
 
 #ifndef RES
 #define RES
 TARGET_TYPE res[size][size];
 #endif
 
-void matrix_mul(TARGET_INDEX size, TARGET_TYPE a[size][size], TARGET_TYPE b[size][size])
+void matrix_mul()
 {
 	TARGET_INDEX i, j, k, tot = 0; 
 
@@ -18,8 +18,7 @@ void matrix_mul(TARGET_INDEX size, TARGET_TYPE a[size][size], TARGET_TYPE b[size
 	 * the multiplication can't be done 
 	 
 
-	if(columns_a != rows_b)
-		return;*/
+	
 
 	/* Iterates through the rows of A */
 	for(i = 0; i < size; i++)
@@ -42,5 +41,5 @@ void matrix_mul(TARGET_INDEX size, TARGET_TYPE a[size][size], TARGET_TYPE b[size
 
 void main()
 {
-	matrix_mul(size, a, b);
+	matrix_mul();
 }

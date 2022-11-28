@@ -39,7 +39,7 @@ void clean_input()
 	}
 }
 
-void bfs(TARGET_INDEX size, TARGET_TYPE a[size][size])
+void bfs()
 {
 	/* 
 	 * We store a -1 in a[node][node] position to indicate that a node has been already visited
@@ -65,5 +65,5 @@ void bfs(TARGET_INDEX size, TARGET_TYPE a[size][size])
 void main()
 {
 	clean_input();
-	bfs(size, a);
+	bfs();
 }

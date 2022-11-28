@@ -50,14 +50,16 @@ class CommandsManager:
         outputFile = search(r'[^:\/;]\{(.*?)\}', cmd)
         flags = cmd.split(" ")
 
-        if outputFile:
+        if outputFile:    
             outputFile = outputFile.group(1)
             flags.remove('{' + outputFile + '}')
-
             with open(outputFile, 'w') as obj:
                 call(flags, stdout = obj) #, stderr = DEVNULL)
         else:
             call(flags) #, stderr = DEVNULL, stdout = DEVNULL)
+
+
+
 
     def executeCommandSet(
             self, cmdSet, inputsPath, parsingFunction = None
@@ -65,10 +67,8 @@ class CommandsManager:
         # Creates the directory containing 
         # the files produced during the execution
         filesDir = "files"
-
         # Moves to the directory containing the results
         chdir(self.workingDir)
-
         # Gets the list of commands
         # if "dependencies" in cmdSet:
         jsonEntry = cmdSet["dependencies"].split(" ")
@@ -76,7 +76,7 @@ class CommandsManager:
 
         if isdir(filesDir): rmtree(filesDir)
         makedirs(filesDir)
-
+        
         for dirName in dirs:
             filesPath = self.workingDir + '/' + filesDir + '/' + dirName
             # Creates the subdirectory containing 
@@ -100,3 +100,5 @@ class CommandsManager:
 
             # Restores the previous working directory
             chdir(self.workingDir)
+
+    

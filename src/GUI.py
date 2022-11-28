@@ -19,7 +19,7 @@ class GUI:
         self.micros = ['Thumb','Leon3', 'Atmega328p', 'Arm','ALL']
 
     def getmicros(self):
-        return ['Thumb','Leon3', 'Atmega328p', 'Arm']
+        return ['Thumb','Leon3',  'Arm','Atmega328p']
 
     def fixSize(self):
         self.root.resizable(0, 0)  # Don't allow resizing in the x or y direction

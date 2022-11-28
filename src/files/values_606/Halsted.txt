@@ -1,0 +1,204 @@
+[kernel] Parsing /home/federico/Scrivania/framework/benchmark/fibcall/frst.c (with preprocessing)
+[metrics] Halstead metrics
+  ================
+  Total operators: 409 
+  Distinct operators: 45 
+  Total_operands: 236 
+  Distinct operands: 126 
+  Program length: 645 
+  Vocabulary size: 171 
+  Program volume: 4784.51 
+  Effort: 201633.13 
+  Program level: 0.02 
+  Difficulty level: 42.14 
+  Time to implement: 11201.84 
+  Bugs delivered: 1.15 
+  
+  
+  Global statistics (Halstead)
+  ============================
+  Operators
+  ---------
+    typedef: 48
+    array: 3
+    for: 1
+    extern: 79
+    ): 4
+    ,: 3
+    {: 1
+    (: 4
+    *: 17
+    }: 1
+    ;: 12
+    +: 1
+    ++: 1
+    =: 7
+    <=: 1
+    blkcnt_t: 1
+    nlink_t: 1
+    TARGET_TYPE: 1
+    FILE: 11
+    gid_t: 1
+    struct statfs {
+      unsigned int f_type; unsigned int f_bsize; unsigned int f_blocks;
+      unsigned int f_bfree; unsigned int f_bavail; unsigned int f_files;
+      unsigned int f_ffree; unsigned int f_fsid; unsigned int f_namelen;
+      unsigned int f_frsize; unsigned int f_flags; unsigned int f_spare[4]; }: 1
+    __builtin_va_list: 1
+    short: 4
+    ssize_t: 1
+    blksize_t: 1
+    ino_t: 1
+    struct stat {
+      dev_t st_dev; ino_t st_ino; mode_t st_mode; nlink_t st_nlink; uid_t
+      st_uid; gid_t st_gid; dev_t st_rdev; off_t st_size; time_t st_atime;
+      time_t st_mtime; time_t st_ctime; blksize_t st_blksize; blkcnt_t
+      st_blocks; }: 1
+    struct __fc_FILE: 1
+    dev_t: 2
+    long: 20
+    int: 85
+    size_t: 4
+    struct __fc_FILE { unsigned int __fc_FILE_id; unsigned int __fc_FILE_data;
+      }: 1
+    signed: 16
+    TARGET_INDEX: 1
+    struct __fc_pos_t: 1
+    uid_t: 1
+    void: 7
+    time_t: 3
+    unsigned: 38
+    char: 14
+    int8_t: 3
+    off_t: 2
+    struct __fc_pos_t { unsigned long __fc_stdio_position; }: 1
+    mode_t: 1
+    
+  Operands
+  --------
+    __fc_heap_status: 1
+    getchar_unlocked: 1
+    sprintf: 1
+    fgets_unlocked: 1
+    feof_unlocked: 1
+    fseeko: 1
+    __fc_stderr: 1
+    ftell: 1
+    pclose: 1
+    fgetpos: 1
+    putchar: 1
+    gets: 1
+    freopen: 1
+    fsetpos: 1
+    vfscanf: 1
+    pop: 24
+    funlockfile: 1
+    ftello: 1
+    asprintf: 1
+    fileno: 1
+    vsprintf: 1
+    push: 24
+    __fc_p_fopen: 1
+    fwrite_unlocked: 1
+    fputs: 1
+    scanf: 1
+    putc_unlocked: 1
+    tmpnam: 1
+    fscanf: 1
+    ferror_unlocked: 1
+    perror: 1
+    fibcall: 1
+    fgetc_unlocked: 1
+    fflush_unlocked: 1
+    clearerr: 1
+    __fc_stdin: 1
+    temp: 3
+    putc: 1
+    clearerr_unlocked: 1
+    rename: 1
+    __fc_stdout: 1
+    flockfile: 1
+    fwrite: 1
+    vfprintf: 1
+    fdopen: 1
+    popen: 1
+    ferror: 1
+    fread: 1
+    fgetc: 1
+    printf: 1
+    tmpfile: 1
+    getc: 1
+    fclose: 1
+    fc_stdlib: 48
+    vscanf: 1
+    getchar: 1
+    sscanf: 1
+    n: 2
+    Fold: 4
+    putchar_unlocked: 1
+    ans: 2
+    ftrylockfile: 1
+    fputc: 1
+    fgets: 1
+    vprintf: 1
+    __fc_tmpnam: 2
+    feof: 1
+    program_invocation_name: 1
+    fputc_unlocked: 1
+    fileno_unlocked: 1
+    snprintf: 1
+    program_invocation_short_name: 1
+    fread_unlocked: 1
+    fprintf: 1
+    vsscanf: 1
+    __fc_p_tmpnam: 1
+    __fc_errno: 1
+    getc_unlocked: 1
+    ungetc: 1
+    vsnprintf: 1
+    fseek: 1
+    puts: 1
+    rewind: 1
+    setvbuf: 1
+    __fc_fopen: 2
+    remove: 1
+    fmemopen: 1
+    fputs_unlocked: 1
+    getline: 1
+    fopen: 1
+    fflush: 1
+    Fnew: 6
+    i: 4
+    dprintf: 1
+    setbuf: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_blksize_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_uid_and_gid.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_string_axiomatic.h": 1
+    2: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_intptr_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_size_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/stddef.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/stdint.h": 1
+    2048: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_ino_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_stat.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_ssize_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/stdarg.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_file.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_fpos_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_mode_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_blkcnt_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_alloc_axiomatic.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_eof.h": 1
+    1: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/stdio.h": 1
+    4: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_time_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/errno.h": 1
+    16: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_nlink_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_dev_t.h": 1
+    0: 1
+    6: 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_wchar_t.h": 1
+    "/home/federico/.opam/coq-experiment/share/frama-c/libc/__fc_define_off_t.h": 1

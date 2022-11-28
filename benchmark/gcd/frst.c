@@ -2,7 +2,7 @@
 #include <values.h>
 
 typedef int8_t TARGET_TYPE;
-typedef uint8_t TARGET_INDEX;
+typedef int8_t TARGET_INDEX;
 
 TARGET_TYPE modulo(TARGET_TYPE x, TARGET_TYPE y)
 {

@@ -4,9 +4,8 @@ from InputsGenerator import InputsGenerator
 from Parser import Parser
 from CommandsManager import CommandsManager
 import shutil
-
 from os.path import dirname, realpath, abspath, isdir, isfile, join
-from os import makedirs, chdir, listdir
+from os import makedirs, chdir, listdir,getcwd
 from json import load
 from csv import reader, DictWriter
 from shutil import move, rmtree
@@ -140,7 +139,14 @@ if(gui.micro=="ALL"):
         """
         Simulation
         """
-    
+        for iss in gui.getmicros():
+            # Creates the directory in which store the results  
+            if not isdir(iss+'/28x28/'+gui.function+'/'+index):
+                makedirs(iss+'/28x28/'+gui.function+'/'+index)
+            
+            shutil.copyfile('/home/federico/Scrivania/framework/benchmark/'+gui.function+'/parameters.json', join(iss+ '/28x28/'+ gui.function+'/' , 'parameters.json'))
+
+        
         for iss in gui.getmicros():
             
             print(
@@ -159,9 +165,10 @@ if(gui.micro=="ALL"):
             cmds['Profiling'], inputsPath, parsingFunction = parser.run
     )
             print("Done!")
-        # Creates the directory in which store the results  
-            if not isdir(iss+"/"+gui.function):
-                makedirs(iss+"/"+gui.function)
+            
+            
+
+            
             print("simulation on the target platform...", end = " ")
             parser = Parser(
             gui.results + "/clockCycles.csv", Parser.PARSERS.get(iss),
@@ -171,6 +178,8 @@ if(gui.micro=="ALL"):
             cmds[iss], inputsPath, parsingFunction = parser.run
     )
             print("Done!")
+            parser = Parser(gui.results + "/Size.csv", Parser.getFramaRow)
+            parser.sizeParser(gui.results + "/files")
             print("calculating cc4s...", end = " ")
     # Generates CC4CS file
             calculateMetric(
@@ -178,39 +187,34 @@ if(gui.micro=="ALL"):
             "cc4csValues.csv"
     )
             print("Done!")
-            files = getFiles('.', '.csv') + getFiles('.', '.txt')
-            for file in files:
-                move(file, join(iss+"/"+gui.function, file))
+            print("collecting execution statistics using frama-c...", end = " ")
+    # Retrieves code metrics using FramaC
+            cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
+
+    # Builds a parser to collect Halsted statistics  
+            parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
+            parser.framaParser(gui.results + "/files", 1)
+
+    # Builds a parser to collect Halsted statistics  
+            parser.outputPath = gui.results + "/McCabe.csv"
+            parser.framaParser(gui.results + "/files", 0)
+            
+            print("Done!")
+            
 
     # Creates a compact representation of the inputs
             parser.inputParser(
             gui.results + "/inputResume.csv", gui.results + "/includes"
     )
-
-        print("collecting execution statistics using frama-c...", end = " ")
-    # Retrieves code metrics using FramaC
-        cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
-
-    # Builds a parser to collect Halsted statistics  
-        parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
-        parser.framaParser(gui.results + "/files", 1)
-
-    # Builds a parser to collect Halsted statistics  
-        parser.outputPath = gui.results + "/McCabe.csv"
-        parser.framaParser(gui.results + "/files", 0)
-        print("Done!")
-
-    
-
-    
-        for iss in gui.getmicros():
             files = getFiles('.', '.csv') + getFiles('.', '.txt')
             for file in files:
-                shutil.copyfile(file, join(iss+"/"+gui.function, file))
+                move(file, join('/home/federico/Scrivania/framework/'+iss+ '/28x28/'+ gui.function+'/'+index+'/' , file))
+
+        
 
     # Deletes the directory containing the inputs for the current type 
-        rmtree("includes/")
-        rmtree("files/")
+        #rmtree("includes/")
+        #rmtree("files/")
 
     print("\n#### Ended! Results stored in ", gui.results)
 else:
@@ -253,6 +257,10 @@ else:
             cmds['Profiling'], inputsPath, parsingFunction = parser.run
     )
         print("Done!")
+
+    
+
+        
         """
         Simulation
         """
@@ -265,6 +273,10 @@ else:
         cmds[gui.micro], inputsPath, parsingFunction = parser.run
     )
         print("Done!")
+        
+        parser = Parser(gui.results + "/Size.csv", Parser.getFramaRow)
+        parser.sizeParser(gui.results + "/files")
+
     # Creates a compact representation of the inputs
         parser.inputParser(
         gui.results + "/inputResume.csv", gui.results + "/includes"
@@ -273,6 +285,7 @@ else:
         print("collecting execution statistics using frama-c...", end = " ")
     # Retrieves code metrics using FramaC
         cmdMan.executeCommandSet(cmds['FramaC'], inputsPath)
+    
 
     # Builds a parser to collect Halsted statistics
         parser = Parser(gui.results + "/Halsted.csv", Parser.getFramaRow)
@@ -282,6 +295,7 @@ else:
         parser.outputPath = gui.results + "/McCabe.csv"
         parser.framaParser(gui.results + "/files", 0)
         print("Done!")
+
 
         print("calculating cc4s...", end = " ")
     # Generates CC4CS file
@@ -298,5 +312,8 @@ else:
         files = getFiles('.', '.csv') + getFiles('.', '.txt')
         for file in files:
             move(file, join(target, file))
+        
 
+        #rmtree("includes/")
+        #rmtree("files/")
         print("\n#### Ended! Results stored in ", gui.results)

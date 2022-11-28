@@ -25,7 +25,7 @@ void create_needs()
 
 }
 
-TARGET_TYPE banker_algorithm(TARGET_INDEX size,  TARGET_TYPE available[size], TARGET_TYPE allocated[size][size], TARGET_TYPE max[size][size])
+TARGET_TYPE banker_algorithm()
 {	
 	for(i = 0; i < size; i++)
 	{
@@ -57,5 +57,5 @@ void main()
 {
 
 	create_needs();
-	banker_algorithm(size, available, allocated,max);
+	banker_algorithm();
 }

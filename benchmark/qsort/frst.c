@@ -51,7 +51,7 @@ typedef int16_t TARGET_INDEX;
 
 TARGET_TYPE istack[10];
 
-void qsort(TARGET_INDEX n, TARGET_TYPE arr[n])
+void qsort()
 {
 	TARGET_INDEX i, ir = n, j, k, l = 1;
 
@@ -150,6 +150,6 @@ void qsort(TARGET_INDEX n, TARGET_TYPE arr[n])
 
 void main()
 {
-	qsort(n, arr);
+	qsort();
 }
 

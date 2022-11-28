@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <values.h>
 
-typedef int16_t TARGET_INDEX;
-typedef int16_t TARGET_TYPE;
+typedef int8_t TARGET_INDEX;
+typedef int8_t TARGET_TYPE;
 
 void merge(TARGET_INDEX left, TARGET_INDEX right, TARGET_INDEX middle)
 {
